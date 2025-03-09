@@ -18,4 +18,6 @@ fl_simulator dosyasının altına client.py açılıp yazılmalı
 experiments diye bi klasör açılmalı. İçine fl_simulator'daki dosyalar kullanılarak bi experiment runlayıp sonuçları kaydetcek bişey tasarlanmalı
     bence ilk adımda bu experimentlar CLI'dan ilerlesin. Zaten CLI'dan yaptık mı bizim iş bitiyo aslında, UI kısmı da nice to have olur bence. Sonuçta makalede simulasyon \
     vidyosu falan koymicaz.
+Data generator ve syntetic data klasörleri silinebilir. Şu anda csv üretiyo, onun yerine direk clientların içinde datayı üretirsek csv importlamakla felan uğraşmayız daha \
+rahat olur bence.
 OPTIONAL: visualization diye bi klasör açılmalı. Ona da visualization şeysini yapcaz işte.
