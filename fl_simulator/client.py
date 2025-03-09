@@ -33,6 +33,6 @@ class Client:
         self.local_dataset_constant_dev = local_dataset_constant_dev
         self.dataset = []
 
-    async def request_updates(self)
+    async def get_updates(self)
         # update dataset
         # TO DO: Client selection algoritmasına göre update etmesi lazım. Loss based ve threshold based'in client kodları farklı çünkü.
