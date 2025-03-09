@@ -23,12 +23,12 @@ class Server:
         self.constant = constant
         self.clients = {}
 
-    def train_model(self, no_of_rounds):
+    async def train_model(self, no_of_rounds):
         init_model_weights()
         model_updates = None
         for i in range(no_of_rounds):
             update_client_weights(model_updates)
-            model_updates = request_updates()
+            model_updates = await request_updates()
             aggregate_model_updates(model_updates)
 
     def init_model_weights(self):
@@ -45,7 +45,7 @@ class Server:
                 break
 
     # sends current model parameters to clients, waits for their response
-    def request_updates(self):
+    async def request_updates(self):
         # TO DO: implement this in client selection algorithms and call it from here
         return 0
 
