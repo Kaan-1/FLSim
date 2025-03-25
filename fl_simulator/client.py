@@ -13,24 +13,14 @@ import asyncio
 
 class Client:
 
-    def __init__(self, download_time_mean, download time_dev,
-                    upload_time_mean, upload_time_dev,
-                    computation_time_mean, computation_time_dev,
-                    dataset_size_mean, dataset_size_dev,
-                    local_dataset_slope_mean, local_dataset_slope_dev,
-                    local_dataset_constant_mean, local_dataset_constant_dev):
-        self.download_time_mean = download_time_mean
-        self.download_time_dev = download_time_dev
-        self.upload_time_mean = upload_time_mean
-        self.upload_time_dev = upload_time_dev
-        self.computation_time_mean = computation_time_mean
-        self.computation_time_dev = computation_time_dev
-        self.dataset_size_mean = dataset_size_mean
-        self.dataset_size_dev = dataset_size_dev
-        self.local_dataset_slope_mean = local_dataset_slope_mean
-        self.local_dataset_slope_dev = local_dataset_slope_dev
-        self.local_dataset_constant_mean = local_dataset_constant_mean
-        self.local_dataset_constant_dev = local_dataset_constant_dev
+    def __init__(self, download_time, upload_time, computation_time,
+                    dataset_size, local_dataset_slope, local_dataset_constant):
+        self.download_time = download_time
+        self.upload_time = upload_time
+        self.computation_time = computation_time
+        self.dataset_size = dataset_size
+        self.local_dataset_slope = local_dataset_slope
+        self.local_dataset_constant = local_dataset_constant
         self.dataset = []
 
     async def get_updates(self)
