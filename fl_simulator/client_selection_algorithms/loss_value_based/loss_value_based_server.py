@@ -1,8 +1,9 @@
 # implements the update_client_weight() and request_updates() methods of the server wrt loss value based algorithm
 import asyncio
 
-async def request_updates_loss(server, s: int):
+async def request_updates(server, s: int):
     client_updates = {}
+    
     # Create tasks for all clients
     tasks = []
     client_list = list(server.clients.keys())
@@ -33,3 +34,8 @@ async def request_updates_loss(server, s: int):
         client_updates[client] = all_updates[client]
 
     return client_updates
+
+
+
+def update_client_weights(server, client_weights):
+    pass    # client weights are not used or updated in loss based CS
