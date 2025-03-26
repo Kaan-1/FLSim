@@ -15,12 +15,14 @@ import client_selection_algorithms.loss_value_based.loss_value_based_client as C
 
 class Client:
 
-    def __init__(self, download_time, upload_time, computation_time, CS_algo):
+    def __init__(self, name, download_time, computation_time,
+                    upload_time, CS_algo, dataset):
+        self.name = name
         self.download_time = download_time
         self.upload_time = upload_time
         self.computation_time = computation_time
         self.CS_algo = CS_algo
-        self.dataset = []
+        self.dataset = dataset
 
     async def get_updates(self, global_model_slope, global_model_constant):
         time.sleep(self.download_time)

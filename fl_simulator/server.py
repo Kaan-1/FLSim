@@ -33,6 +33,7 @@ class Server:
         self.init_model_weights()
         client_updates = None
         for i in range(no_of_rounds):
+            print("Round: ", i, "\t\tCurrent model weights: ()", self.slope, ", ", self.constant)
             self.update_client_weights(client_updates)
             client_updates = await self.request_updates()
             self.aggregate_updates(client_updates)

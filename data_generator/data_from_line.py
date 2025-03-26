@@ -22,10 +22,10 @@ def generate_client_data(slope, constant, num_of_points, interval_start, interva
         y_val = (slope * step) + constant
         error = np.random.normal(loc=0, scale = error_var)
         data.append([step, y_val+error])
-    with open("../syntetic_data/"+file_name+".csv", "w", newline="") as file:
+    with open("syntetic_data/"+file_name+".csv", "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerows(data)
     print(data)
     return 0
 
-generate_client_data(2, 5, 10, 0, 10, 1, "client1")
+# example usage: generate_client_data(2, 5, 10, 0, 10, 1, "client1")
