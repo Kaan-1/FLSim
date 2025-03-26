@@ -10,19 +10,29 @@
 # For every round, the client updates its local dataset diye düşündüm de bilemedim
 
 import asyncio
+import time
+import client_selection_algorithms.loss_value_based.loss_value_based_client as CS_loss
 
 class Client:
 
-    def __init__(self, download_time, upload_time, computation_time,
-                    dataset_size, local_dataset_slope, local_dataset_constant):
+    def __init__(self, download_time, upload_time, computation_time, CS_algo):
         self.download_time = download_time
         self.upload_time = upload_time
         self.computation_time = computation_time
-        self.dataset_size = dataset_size
-        self.local_dataset_slope = local_dataset_slope
-        self.local_dataset_constant = local_dataset_constant
+        self.CS_algo = CS_algo
         self.dataset = []
 
-    async def get_updates(self):
-        # update dataset
-        # TO DO: Client selection algoritmasına göre update etmesi lazım. Loss based ve threshold based'in client kodları farklı çünkü.
+    async def get_updates(self, global_model_slope, global_model_constant):
+        time.sleep(self.download_time)
+        time.sleep(self.computation_time)
+        updates = None
+        if self.CS_algo == "loss":
+            updates = CS_loss.get_updates(self, global_model_slope, global_model_constant)
+        elif self.CS_algo == "threshold":
+            pass    # TO DO
+        elif self.CS_algo == "reputation":
+            pass    # TO DO
+        else:   # self.CS_algo == "multi"
+            pass    # TO DO
+        time.sleep(self.upload_time)
+        return updates

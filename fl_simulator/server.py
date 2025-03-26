@@ -89,4 +89,3 @@ class Server:
         # Apply the updates with learning rate
         self.slope += self.learning_rate * avg_slope_update
         self.constant += self.learning_rate * avg_constant_update
-
