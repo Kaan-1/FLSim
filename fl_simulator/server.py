@@ -12,8 +12,8 @@
 
 import numpy as np
 import asyncio
-import client_selection_algorithms.loss_value_based.loss_value_based_server as CS_loss
-import client_selection_algorithms.threshold_based.threshold_based_server as CS_threshold
+from .client_selection_algorithms.loss_value_based import loss_value_based_server as CS_loss
+# import client_selection_algorithms.threshold_based.threshold_based_server as CS_threshold
 
 class Server:
 

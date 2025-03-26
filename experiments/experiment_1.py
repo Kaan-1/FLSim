@@ -13,7 +13,7 @@ def main():
     clients = []
     for i in range(1, 16):
         client_name = f"client_{i}"
-        dfl.data_from_line.generate_client_data(2, 5, 10, 0, 10, 1, client_name)
+        dfl.generate_client_data(2, 5, 10, 0, 10, 1, client_name)
         clients.append(cl.Client(name=client_name, download_time=1, 
                                     computation_time=2, upload_time=1, 
                                     CS_algo = exp_CS_algo, dataset=ctl.csv_to_list(client_name)))
@@ -24,7 +24,7 @@ def main():
     # add the clients to the server
     for client in clients:
         server.add_client(client, 1)
-    
+
     # train the model
     server.train_model(100)
     
@@ -33,3 +33,6 @@ def main():
     print("Calculated global model constant is: ", server.constant)
     
     pass
+
+if __name__ == "__main__":
+    main()

@@ -11,7 +11,7 @@
 
 import asyncio
 import time
-import client_selection_algorithms.loss_value_based.loss_value_based_client as CS_loss
+from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
 
 class Client:
 
