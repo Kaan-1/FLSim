@@ -36,11 +36,8 @@ class Server:
         client_updates = None
         for i in range(no_of_rounds):
             print("Round: ", i, "\t\tCurrent model weights: ()", self.slope, ", ", self.constant)
-            print("Updating client weights.")
             self.update_client_weights(client_updates)
-            print("Requesting updates.")
             client_updates = await self.request_updates(self.no_of_clients)
-            print("aggreagating the updates.")
             self.aggregate_updates(client_updates)
 
     def add_client(self, client_obj, init_weigth):
