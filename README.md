@@ -51,14 +51,14 @@ python run_experiment.py [response_variances] [experiment_type] [client_selectio
 - Reputation Based
 - Multi-criteria Based
 
-**Experiments**
+**Datasets**
 
 - homo_low_dev ✅
-- homo_high_dev
-- semi_homo_low_dev
-- semi_homo_high_dev
-- hetero_low_dev
-- hetero_low_dev
+- homo_high_dev ✅
+- semi_homo_low_dev ✅
+- semi_homo_high_dev ✅
+- hetero_low_dev ✅
+- hetero_low_dev ✅
 
 **CLI Usability** ✅
 
