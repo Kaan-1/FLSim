@@ -10,7 +10,6 @@
 # For every round, the client updates its local dataset diye düşündüm de bilemedim
 
 import asyncio
-import time
 from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
 
 class Client:
@@ -25,8 +24,10 @@ class Client:
         self.dataset = dataset
 
     async def get_updates(self, global_model_slope, global_model_constant):
-        time.sleep(self.download_time)
-        time.sleep(self.computation_time)
+        #print(f"Hey! I'm {self.name}. I'm downloading now.")
+        await asyncio.sleep(self.download_time)
+        #print(f"Hey! I'm {self.name}. I'm computing now.")
+        await asyncio.sleep(self.computation_time)
         updates = None
         if self.CS_algo == "loss":
             updates = CS_loss.get_updates(self, global_model_slope, global_model_constant)
@@ -36,5 +37,6 @@ class Client:
             pass    # TO DO
         else:   # self.CS_algo == "multi"
             pass    # TO DO
-        time.sleep(self.upload_time)
+        #print(f"Hey! I'm {self.name}. I'm uploading now.")
+        await asyncio.sleep(self.upload_time)
         return updates

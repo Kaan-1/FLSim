@@ -6,13 +6,16 @@ async def request_updates(server, s: int):
     
     # Create tasks for all clients
     tasks = []
-    client_list = list(server.clients.keys())
+    client_list = list(server.client_weights.keys())
     
+    print("Sending out the tasks to clients.")
     for client in client_list:
         # Assuming client.get_updates() is an async method that needs current model parameters
-        task = client.get_updates(slope=server.slope, constant=server.constant)
+        task = client.get_updates(global_model_slope=server.slope,
+                                    global_model_constant=server.constant)
         tasks.append(task)
     
+    print("Waiting for results")
     # Wait for all updates to complete
     results = await asyncio.gather(*tasks)
     
@@ -24,7 +27,7 @@ async def request_updates(server, s: int):
     # Sort clients by loss (assuming result contains loss value)
     # Lower loss is better, so we sort in ascending order
     sorted_clients = sorted(all_updates.keys(), 
-                        key=lambda client: all_updates[client].get('loss', float('inf')))
+                        key=lambda client: all_updates[client][2])  # third att of result is loss
     
     # Select only the top s clients
     selected_clients = sorted_clients[:min(s, len(sorted_clients))]

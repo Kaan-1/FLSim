@@ -169,3 +169,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# csv files in the data_generator
+data_generator/syntetic_data/*.csv

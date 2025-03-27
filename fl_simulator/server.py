@@ -20,9 +20,11 @@ class Server:
     # float slope: slope of the aggregated line model (a of ax+b)
     # float constant: constant of the aggreagated line model (b of ax+b)
     # Dict(Client->int) clients: a dictionary of clients together with their weights
-    def __init__(self, CS_algo: str, learning_rate: float):
-        self.CL_algo = CS_algo
+    # int no_of_clients: number of clients to be picked in each iteration 
+    def __init__(self, CS_algo: str, learning_rate: float, no_of_clients: int):
+        self.CS_algo = CS_algo
         self.learning_rate = learning_rate
+        self.no_of_clients = no_of_clients
         self.client_weights = {}
 
     def init_model_weights(self):
@@ -34,8 +36,11 @@ class Server:
         client_updates = None
         for i in range(no_of_rounds):
             print("Round: ", i, "\t\tCurrent model weights: ()", self.slope, ", ", self.constant)
+            print("Updating client weights.")
             self.update_client_weights(client_updates)
-            client_updates = await self.request_updates()
+            print("Requesting updates.")
+            client_updates = await self.request_updates(self.no_of_clients)
+            print("aggreagating the updates.")
             self.aggregate_updates(client_updates)
 
     def add_client(self, client_obj, init_weigth):

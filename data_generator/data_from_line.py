@@ -3,6 +3,7 @@
 
 import numpy as np
 import csv
+import os
 
 # float slope: slope of the line (a of ax+b)
 # float constant: constant of the line (b of ax+b)
@@ -13,6 +14,12 @@ import csv
 def generate_client_data(slope, constant, num_of_points, interval_start, interval_end, error_var, file_name):
     if interval_end<=interval_start or num_of_points<=0 or error_var<=0:
         raise Exception("There was an invalid input")
+    
+    # Get the directory where this script is located
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Define the path to the syntetic_data directory relative to this script
+    syntetic_data_dir = os.path.join(current_dir, "syntetic_data")
+
     data = []
     interval_len = interval_end - interval_start
     step_size = interval_len / num_of_points
@@ -22,10 +29,12 @@ def generate_client_data(slope, constant, num_of_points, interval_start, interva
         y_val = (slope * step) + constant
         error = np.random.normal(loc=0, scale = error_var)
         data.append([step, y_val+error])
-    with open("syntetic_data/"+file_name+".csv", "w", newline="") as file:
+
+    # Use the absolute path to write the file
+    file_path = os.path.join(syntetic_data_dir, f"{file_name}.csv")
+    with open(file_path, "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerows(data)
-    print(data)
     return 0
 
 # example usage: generate_client_data(2, 5, 10, 0, 10, 1, "client1")

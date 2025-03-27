@@ -21,3 +21,9 @@ experiments diye bi klasör açılmalı. İçine fl_simulator'daki dosyalar kull
 Data generator ve syntetic data klasörleri silinebilir. Şu anda csv üretiyo, onun yerine direk clientların içinde datayı üretirsek csv importlamakla felan uğraşmayız daha \
 rahat olur bence.
 OPTIONAL: visualization diye bi klasör açılmalı. Ona da visualization şeysini yapcaz işte.
+
+TO RUN EXPRERIMENT 1
+
+Go to the FLSim directory
+
+Run "python -m experiments.experiment_1"
