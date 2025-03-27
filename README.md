@@ -15,7 +15,9 @@ This simulation tries to derive a 2D line using federated learning on 15 clients
 
 ## Experiments
 
-There are several preconstructed experiments for a user to run. They all follow the same simulation, but with different datasets. Types of experiments, with their explanations, and instructions on how to run an experiment is given below.
+In this simulation, each client has different download time, computation time and upload time, resulting in different repsonse times. Variance of these values must be picked from the CLI.
+
+There are several pretuned experiment datasets for a user to utilize. The datasets are still generated during runtime, but these options effect the parameters of the dataset being generated. Types of datasets, with their explanations, and instructions on how to run an experiment is given below.
 
 - **homo_low_dev**: Syntetic datasets of the clients all follow the same normal distribution, and they all have low individual deviation
 - **homo_high_dev**: Syntetic datasets of the clients all follow the same normal distribution, but with deviation high individual deviation
@@ -27,10 +29,39 @@ There are several preconstructed experiments for a user to run. They all follow 
 To run an experiment, execute the following command in the FLSim/ directory:
 
 ```shell
-python run_experiment.py [experiment_type] [client_selection_algorithm]
+python run_experiment.py [response_variances] [experiment_type] [client_selection_algorithm]
 ```
+
+**Valid response_variances values**: low, medium, high
 
 **Valid experiment_type values**: homo_low_dev, homo_high_dev, semi_homo_low_dev, semi_homo_high_dev, hetero_low_dev, hetero_low_dev
 
 **Valid client_selection_algorithm values**: loss, threshold, reputation, multi
 
+**WARNING**: Picking high response_variances and non-homo experiment_type may result in inconsistent experiment result, as clients are attended response times randomly.
+
+## TO DO
+
+**Simulation Framework** ✅
+
+**Client Selection Algorithms**
+
+- Loss Based ✅
+- Threshold Based
+- Reputation Based
+- Multi-criteria Based
+
+**Experiments**
+
+- homo_low_dev ✅
+- homo_high_dev
+- semi_homo_low_dev
+- semi_homo_high_dev
+- hetero_low_dev
+- hetero_low_dev
+
+**CLI Usability** ✅
+
+**Logging**
+
+**UI**
