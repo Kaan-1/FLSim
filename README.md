@@ -15,7 +15,7 @@ This simulation tries to derive a 2D line using federated learning on 15 clients
 
 ## Experiments
 
-In this simulation, each client has different download time, computation time and upload time, resulting in different repsonse times. Variance of these values must be picked from the CLI.
+Before running the experiment, you should go into the run_experiment.py file in the root directory, and modify the variables according to your needs. Values that can be modified can be found between "VARIABLE SPOT START" and "VARIABLE SPOT END". The explanation of the possible values for the exp_type variable is given below, since it is not clear from the get go.
 
 There are several pretuned experiment datasets for a user to utilize. The datasets are still generated during runtime, but these options effect the parameters of the dataset being generated. Types of datasets, with their explanations, and instructions on how to run an experiment is given below.
 
@@ -26,19 +26,13 @@ There are several pretuned experiment datasets for a user to utilize. The datase
 - **hetero_low_dev**: Syntetic datasets of clients follow different normal distributions. In particular, some are positively skewed, and some are on the true line. But they follow low individual deviations.
 - **hetero_low_dev**: Syntetic datasets of clients follow different normal distributions. In particular, some are positively skewed, and some are on the true line. They follow high individual deviations.
 
-To run an experiment, execute the following command in the FLSim/ directory:
+To run an experiment, simply execute the following command in the FLSim/ directory after modifying the variables:
 
 ```shell
-python run_experiment.py [response_variances] [experiment_type] [client_selection_algorithm]
+python run_experiment.py
 ```
 
-**Valid response_variances values**: low, medium, high
-
-**Valid experiment_type values**: homo_low_dev, homo_high_dev, semi_homo_low_dev, semi_homo_high_dev, hetero_low_dev, hetero_low_dev
-
-**Valid client_selection_algorithm values**: loss, threshold, reputation, multi
-
-**WARNING**: Picking high response_variances and non-homo experiment_type may result in inconsistent experiment result, as clients are attended response times randomly.
+**WARNING**: Picking high resp_var and non-homo experiment_type may result in inconsistent experiment result, as clients are attended response times randomly.
 
 ## TO DO
 
@@ -60,8 +54,11 @@ python run_experiment.py [response_variances] [experiment_type] [client_selectio
 - hetero_low_dev ✅
 - hetero_low_dev ✅
 
-**CLI Usability** ✅
-
 **Logging**
 
 **UI**
+
+
+## UPDATE NOTES
+
+CLI usability was implemented, but later reverted because of the difficulty of usability caused by the high number of variables that can be modified.

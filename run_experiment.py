@@ -10,34 +10,72 @@ import argparse
 
 async def main():
 
-    # Set up command line argument parsing
-    parser = argparse.ArgumentParser(description='Run federated learning experiment')
-    parser.add_argument('response_variance', nargs='?', default="low",
-                        choices=["low", "medium", "high"],
-                        help='Type of experiment to run (homogeneous, heterogeneous, malicious)')
-    parser.add_argument('experiment_type', nargs='?', default="homogeneous",
-                        choices=["homo_low_dev", "homo_high_dev", "semi_homo_low_dev",
-                                    "semi_homo_high_dev", "hetero_low_dev", "hetero_high_dev"],
-                        help='Type of experiment to run (homogeneous, heterogeneous, malicious)')
-    parser.add_argument('cs_algo', nargs='?', default="loss", 
-                        choices=["loss", "threshold", "reputation", "multi"],
-                        help='Client selection algorithm (loss, threshold, reputation, multi)')
-    args = parser.parse_args()
+
+
+    #######################################################################
+    ####################### VARIABLE SPOT START ###########################
+    #######################################################################
+
+
+
+    # type of dataset to be used for clients
+    # detalied information about the datasets can be found in the readme
+    # possible values include: 
+        # homo_low_dev 
+        # homo_high_dev 
+        # semi_homo_low_dev
+        # semi_homo_high_dev 
+        # hetero_low_dev 
+        # hetero_high_dev
+    exp_type = "homo_low_dev"
+
+
+    # type of CS algorithm to be tested in the simulation
+    # possible values include
+        # loss
+        # threshold
+        # reputation
+        # multi
+    exp_CS_algo = "loss"
+
+
+    # variance of response times that the clients will have
+    # Recommended values
+        # low: 0.25
+        # mid: 1
+        # high: 5
+    resp_var = 1
+
+
+    # Learning rate of the ML algorithm
+    learning_rate = 0.1
+
+
+    # number of clients to be picked each round
+    # Redundant for some of the CS algorihms, such as threshold based CS
+    # Total number of clients is 15
+    no_of_cln = 10
+
+
+    # Time limit that clients are allowed to compute their updates in
+    # Only used in threshold based client selection
+    # Have to make it None otherwise, because of the current implementation
+    threshold = 0.04
+    if exp_CS_algo != "threshold":
+        threshold = None
+
     
-    exp_type = args.experiment_type
-    exp_CS_algo = args.cs_algo
-    exp_resp_var = args.response_variance
+
+
+    #######################################################################
+    ####################### VARIABLE SPOT END #############################
+    #######################################################################
+
     print(f"Running {exp_type} experiment with client selection algorithm: {exp_CS_algo}")
 
     # randomly generate data for clients, and then create the clients
     print("Creating clients.")
     clients = []
-    if exp_resp_var == "low":
-        resp_var = 0.5
-    elif exp_resp_var == "medium":
-        resp_var = 2
-    elif exp_resp_var == "high":
-        resp_var = 5
 
     # randomly generate response times based on the user response_variance picking
     down_times = []
@@ -128,7 +166,7 @@ async def main():
         raise KeyError("Invalid experiment type.")
     
     # create the server
-    server = sv.Server(exp_CS_algo, 0.1, no_of_clients=10, threshold=0.04)
+    server = sv.Server(exp_CS_algo, learning_rate, no_of_clients=no_of_cln, threshold=threshold)
 
     # add the clients to the server
     for client in clients:
