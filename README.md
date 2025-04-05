@@ -41,11 +41,11 @@ python run_experiment.py
 **Client Selection Algorithms**
 
 - Loss Based ✅
-- Threshold Based
-- Reputation Based
+- Threshold Based✅
+- Reputation Based✅
 - Multi-criteria Based
 
-**Datasets**
+**Datasets**✅
 
 - homo_low_dev ✅
 - homo_high_dev ✅
@@ -55,6 +55,10 @@ python run_experiment.py
 - hetero_low_dev ✅
 
 **Logging**
+
+**Simulation-time client dataset updates**
+
+**Global seed for randomization**
 
 **UI**
 

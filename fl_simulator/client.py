@@ -12,7 +12,7 @@
 import asyncio
 from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
 from .client_selection_algorithms.threshold_based import threshold_based_client as CS_threshold
-
+from .client_selection_algorithms.reputation_based import reputation_based_client as CS_reputation
 
 class Client:
 
@@ -25,21 +25,36 @@ class Client:
         self.CS_algo = CS_algo
         self.dataset = dataset
 
+
+    # for debugging purposes
+    # only shows client name when using pprint
+    def __repr__(self):
+        return self.name
+
+
     async def get_updates(self, global_model_slope, global_model_constant, threshold = None):
+
+        # imitate downloading the global model
         await asyncio.sleep(self.download_time)
+
+        # imitate computing the local update
         if threshold != None:   # special case for threshold based CS
-            if threshold > self.computation_time:
-                await asyncio.sleep(self.computation_time)
-            else:
+            if threshold < self.computation_time:
                 await asyncio.sleep(threshold)
+        else:
+            await asyncio.sleep(self.computation_time)
+        
         updates = None
         if self.CS_algo == "loss":
             updates = CS_loss.get_updates(self, global_model_slope, global_model_constant)
         elif self.CS_algo == "threshold":
             updates = CS_threshold.get_updates(self, global_model_slope, global_model_constant, threshold)
         elif self.CS_algo == "reputation":
-            pass    # TO DO
+            updates = CS_reputation.get_updates(self, global_model_slope, global_model_constant)
         else:   # self.CS_algo == "multi"
             pass    # TO DO
+
+        # imitate uploading the calculated local update
         await asyncio.sleep(self.upload_time)
+
         return updates

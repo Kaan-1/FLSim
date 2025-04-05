@@ -7,7 +7,7 @@ async def request_updates(server):
     
     # Create tasks for all clients
     tasks = []
-    client_list = list(server.client_weights.keys())
+    client_list = list(server.client_scores.keys())
     
     for client in client_list:
         # Assuming client.get_updates() is an async method that needs current model parameters
@@ -34,5 +34,5 @@ async def request_updates(server):
 
 
 
-def update_client_weights(server, client_updates):
-    pass    # client weights are not used or updated in loss based CS
+def update_client_scores(server, client_updates):
+    pass    # client scores are not used or updated in threshold based CS

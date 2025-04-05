@@ -11,9 +11,10 @@
 # also, upon receiving the updates, can aggregate them with respect to client's weights
 
 import numpy as np
-import asyncio
+import pprint
 from .client_selection_algorithms.loss_value_based import loss_value_based_server as CS_loss
 from .client_selection_algorithms.threshold_based import threshold_based_server as CS_threshold
+from .client_selection_algorithms.reputation_based import reputation_based_server as CS_reputation
 
 class Server:
 
@@ -26,7 +27,7 @@ class Server:
         self.learning_rate = learning_rate
         self.no_of_clients = no_of_clients
         self.threshold = threshold
-        self.client_weights = {}
+        self.client_scores = {}
 
     def init_model_weights(self):
         self.slope = np.random.normal(0, 0.01)
@@ -36,18 +37,19 @@ class Server:
         self.init_model_weights()
         client_updates = None
         for i in range(no_of_rounds):
-            print("Round: ", i, "\t\tCurrent model weights: ()", self.slope, ", ", self.constant)
-            self.update_client_weights(client_updates)
+            print("\nRound: ", i, "\t\tCurrent model weights: ()", self.slope, ", ", self.constant)
+            self.update_client_scores(client_updates)
+            pprint.pprint(f"Updated client scores for this round are: {self.client_scores}")
             client_updates = await self.request_updates()
             self.aggregate_updates(client_updates)
 
     def add_client(self, client_obj, init_weigth):
-        self.client_weights[client_obj] = init_weigth
+        self.client_scores[client_obj] = init_weigth
 
     def remove_client(self, client_name):
-        for client in self.client_weights.keys():
+        for client in self.client_scores.keys():
             if client.name == client_name:
-                del self.client_weights[client]
+                del self.client_scores[client]
                 break
 
     # sends current model parameters to clients, waits for their response
@@ -59,20 +61,20 @@ class Server:
         elif self.CS_algo == "threshold":
             client_updates = await CS_threshold.request_updates(self)
         elif self.CS_algo == "reputation":
-            pass    # TO DO
+            client_updates = await CS_reputation.request_updates(self)
         else:   # self.CS_algo == "multi"
             pass    # TO DO
         return client_updates
 
 
     # updates the weights of the clients (0=not picked, 1=fully picked)
-    def update_client_weights(self, client_updates):
+    def update_client_scores(self, client_updates):
         if self.CS_algo == "loss":
-            CS_loss.update_client_weights(self, client_updates)
+            CS_loss.update_client_scores(self, client_updates)
         elif self.CS_algo == "threshold":
-            CS_threshold.update_client_weights(self, client_updates)
+            CS_threshold.update_client_scores(self, client_updates)
         elif self.CS_algo == "reputation":
-            pass    # TO DO
+            CS_reputation.update_client_scores(self, client_updates)
         else:   # self.CS_algo == "multi"
             pass    # TO DO
 

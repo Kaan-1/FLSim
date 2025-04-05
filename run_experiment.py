@@ -6,11 +6,9 @@ import fl_simulator.server as sv
 import fl_simulator.client as cl
 import asyncio
 import numpy as np
-import argparse
+import pprint
 
 async def main():
-
-
 
     #######################################################################
     ####################### VARIABLE SPOT START ###########################
@@ -36,7 +34,7 @@ async def main():
         # threshold
         # reputation
         # multi
-    exp_CS_algo = "loss"
+    exp_CS_algo = "reputation"
 
 
     # variance of response times that the clients will have
@@ -44,11 +42,27 @@ async def main():
         # low: 0.25
         # mid: 1
         # high: 5
-    resp_var = 1
+    resp_var = 0.01
+
+
+    # average download time of clients
+    avg_download_time = 0.01
+
+
+    # average computation time of clients
+    avg_computation_time = 0.04
+
+
+    # average upload time of clients
+    avg_upload_time = 0.02
 
 
     # Learning rate of the ML algorithm
     learning_rate = 0.1
+
+
+    # no of rounds to train the model
+    no_of_rounds = 10
 
 
     # number of clients to be picked each round
@@ -64,7 +78,6 @@ async def main():
     if exp_CS_algo != "threshold":
         threshold = None
 
-    
 
 
     #######################################################################
@@ -90,9 +103,9 @@ async def main():
             # down_val = abs(np.random.normal(loc=1, scale=resp_var))
             # comp_val = abs(np.random.normal(loc=4, scale=resp_var))
             # up_val = abs(np.random.normal(loc=2, scale=resp_var))
-        down_val = abs(np.random.normal(loc=0.001, scale=resp_var*0))
-        comp_val = abs(np.random.normal(loc=0.004, scale=resp_var))
-        up_val = abs(np.random.normal(loc=0.002, scale=resp_var*0))
+        down_val = abs(np.random.normal(loc=avg_download_time, scale=resp_var))
+        comp_val = abs(np.random.normal(loc=avg_computation_time, scale=resp_var))
+        up_val = abs(np.random.normal(loc=avg_upload_time, scale=resp_var))
         down_times.append(down_val)
         comp_times.append(comp_val)
         up_times.append(up_val)
@@ -170,10 +183,10 @@ async def main():
 
     # add the clients to the server
     for client in clients:
-        server.add_client(client, 1)
+        server.add_client(client, 10)
 
     # train the model
-    await server.train_model(100)
+    await server.train_model(no_of_rounds)
     
     # print model results
     print("Calculated global model slope is: ", server.slope)
