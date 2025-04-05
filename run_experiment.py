@@ -53,7 +53,7 @@ async def main():
             # comp_val = abs(np.random.normal(loc=4, scale=resp_var))
             # up_val = abs(np.random.normal(loc=2, scale=resp_var))
         down_val = abs(np.random.normal(loc=0.001, scale=resp_var*0))
-        comp_val = abs(np.random.normal(loc=0.004, scale=resp_var*0))
+        comp_val = abs(np.random.normal(loc=0.004, scale=resp_var))
         up_val = abs(np.random.normal(loc=0.002, scale=resp_var*0))
         down_times.append(down_val)
         comp_times.append(comp_val)
@@ -128,7 +128,7 @@ async def main():
         raise KeyError("Invalid experiment type.")
     
     # create the server
-    server = sv.Server(exp_CS_algo, 0.1, 10)
+    server = sv.Server(exp_CS_algo, 0.1, no_of_clients=10, threshold=0.04)
 
     # add the clients to the server
     for client in clients:

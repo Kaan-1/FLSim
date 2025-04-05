@@ -1,7 +1,7 @@
 # implements the update_client_weight() and request_updates() methods of the server wrt loss value based algorithm
 import asyncio
 
-async def request_updates(server, s: int):
+async def request_updates(server):
     client_updates = {}
     
     # Create tasks for all clients
@@ -27,8 +27,8 @@ async def request_updates(server, s: int):
     sorted_clients = sorted(all_updates.keys(), 
                         key=lambda client: all_updates[client][2])  # third att of result is loss
     
-    # Select only the top s clients
-    selected_clients = sorted_clients[:max(s, len(sorted_clients))]
+    # Select only the top server.no_of_clients clients
+    selected_clients = sorted_clients[:max(server.no_of_clients, len(sorted_clients))]
 
     selected_client_names = []
     for client in selected_clients:
@@ -43,5 +43,5 @@ async def request_updates(server, s: int):
 
 
 
-def update_client_weights(server, client_weights):
+def update_client_weights(server, client_updates):
     pass    # client weights are not used or updated in loss based CS

@@ -11,6 +11,8 @@
 
 import asyncio
 from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
+from .client_selection_algorithms.threshold_based import threshold_based_client as CS_threshold
+
 
 class Client:
 
@@ -23,20 +25,21 @@ class Client:
         self.CS_algo = CS_algo
         self.dataset = dataset
 
-    async def get_updates(self, global_model_slope, global_model_constant):
-        #print(f"Hey! I'm {self.name}. I'm downloading now.")
+    async def get_updates(self, global_model_slope, global_model_constant, threshold = None):
         await asyncio.sleep(self.download_time)
-        #print(f"Hey! I'm {self.name}. I'm computing now.")
-        await asyncio.sleep(self.computation_time)
+        if threshold != None:   # special case for threshold based CS
+            if threshold > self.computation_time:
+                await asyncio.sleep(self.computation_time)
+            else:
+                await asyncio.sleep(threshold)
         updates = None
         if self.CS_algo == "loss":
             updates = CS_loss.get_updates(self, global_model_slope, global_model_constant)
         elif self.CS_algo == "threshold":
-            pass    # TO DO
+            updates = CS_threshold.get_updates(self, global_model_slope, global_model_constant, threshold)
         elif self.CS_algo == "reputation":
             pass    # TO DO
         else:   # self.CS_algo == "multi"
             pass    # TO DO
-        #print(f"Hey! I'm {self.name}. I'm uploading now.")
         await asyncio.sleep(self.upload_time)
         return updates
