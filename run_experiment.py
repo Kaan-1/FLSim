@@ -34,7 +34,7 @@ async def main():
         # threshold
         # reputation
         # multi
-    exp_CS_algo = "reputation"
+    exp_CS_algo = "multi"
 
 
     # variance of response times that the clients will have

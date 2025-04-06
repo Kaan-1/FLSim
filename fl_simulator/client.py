@@ -13,6 +13,7 @@ import asyncio
 from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
 from .client_selection_algorithms.threshold_based import threshold_based_client as CS_threshold
 from .client_selection_algorithms.reputation_based import reputation_based_client as CS_reputation
+from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_client as CS_multi_criteria
 
 class Client:
 
@@ -52,7 +53,7 @@ class Client:
         elif self.CS_algo == "reputation":
             updates = CS_reputation.get_updates(self, global_model_slope, global_model_constant)
         else:   # self.CS_algo == "multi"
-            pass    # TO DO
+            updates = CS_multi_criteria.get_updates(self, global_model_slope, global_model_constant)
 
         # imitate uploading the calculated local update
         await asyncio.sleep(self.upload_time)

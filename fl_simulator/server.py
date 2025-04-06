@@ -15,6 +15,7 @@ import pprint
 from .client_selection_algorithms.loss_value_based import loss_value_based_server as CS_loss
 from .client_selection_algorithms.threshold_based import threshold_based_server as CS_threshold
 from .client_selection_algorithms.reputation_based import reputation_based_server as CS_reputation
+from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_server as CS_multi_criteria
 
 class Server:
 
@@ -39,7 +40,6 @@ class Server:
         for i in range(no_of_rounds):
             print("\nRound: ", i, "\t\tCurrent model weights: ()", self.slope, ", ", self.constant)
             self.update_client_scores(client_updates)
-            pprint.pprint(f"Updated client scores for this round are: {self.client_scores}")
             client_updates = await self.request_updates()
             self.aggregate_updates(client_updates)
 
@@ -63,7 +63,7 @@ class Server:
         elif self.CS_algo == "reputation":
             client_updates = await CS_reputation.request_updates(self)
         else:   # self.CS_algo == "multi"
-            pass    # TO DO
+            client_updates = await CS_multi_criteria.request_updates(self)
         return client_updates
 
 
@@ -76,7 +76,7 @@ class Server:
         elif self.CS_algo == "reputation":
             CS_reputation.update_client_scores(self, client_updates)
         else:   # self.CS_algo == "multi"
-            pass    # TO DO
+            CS_multi_criteria.update_client_scores(self,client_updates)
 
     def aggregate_updates(self, client_updates):
         # Extract all slope and constant updates from client_updates
