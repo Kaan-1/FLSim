@@ -38,12 +38,12 @@ python run_experiment.py
 
 **Simulation Framework** ✅
 
-**Client Selection Algorithms**
+**Client Selection Algorithms**✅
 
 - Loss Based ✅
 - Threshold Based✅
 - Reputation Based✅
-- Multi-criteria Based
+- Multi-criteria Based✅
 
 **Datasets**✅
 
@@ -56,7 +56,7 @@ python run_experiment.py
 
 **Logging**
 
-**Simulation-time client dataset updates**
+**Simulation-time client attribute updates**
 
 **Global seed for randomization**
 

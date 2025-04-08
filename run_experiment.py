@@ -1,11 +1,9 @@
-# This experiment performs FL on homogenous clients
+# This experiment performs FL on 15 clients
+# The picked ML model is 2D linear regression
 # The line we want to reach is 2x+5
-import data_generator.data_from_line as dfl
-import data_generator.csv_to_list as ctl
 import fl_simulator.server as sv
 import fl_simulator.client as cl
 import asyncio
-import numpy as np
 import pprint
 
 async def main():
@@ -25,7 +23,7 @@ async def main():
         # semi_homo_high_dev 
         # hetero_low_dev 
         # hetero_high_dev
-    exp_type = "homo_low_dev"
+    exp_type = "hetero_low_dev"
 
 
     # type of CS algorithm to be tested in the simulation
@@ -34,7 +32,7 @@ async def main():
         # threshold
         # reputation
         # multi
-    exp_CS_algo = "multi"
+    exp_CS_algo = "loss"
 
 
     # variance of response times that the clients will have
@@ -55,6 +53,10 @@ async def main():
 
     # average upload time of clients
     avg_upload_time = 0.02
+
+
+    # average number of entries to be deleted/added per round for clients
+    avg_data_update = 2
 
 
     # Learning rate of the ML algorithm
@@ -90,34 +92,15 @@ async def main():
     print("Creating clients.")
     clients = []
 
-    # randomly generate response times based on the user response_variance picking
-    down_times = []
-    comp_times = []
-    up_times = []
-    for i in range(15):
-        # WARNING: If you want to run the experiment fastly, paste the following
-            # down_val = abs(np.random.normal(loc=0.001, scale=resp_var*0))
-            # comp_val = abs(np.random.normal(loc=0.004, scale=resp_var*0))
-            # up_val = abs(np.random.normal(loc=0.002, scale=resp_var*0))
-        # If you want to run the experiment normaly, paste the following
-            # down_val = abs(np.random.normal(loc=1, scale=resp_var))
-            # comp_val = abs(np.random.normal(loc=4, scale=resp_var))
-            # up_val = abs(np.random.normal(loc=2, scale=resp_var))
-        down_val = abs(np.random.normal(loc=avg_download_time, scale=resp_var))
-        comp_val = abs(np.random.normal(loc=avg_computation_time, scale=resp_var))
-        up_val = abs(np.random.normal(loc=avg_upload_time, scale=resp_var))
-        down_times.append(down_val)
-        comp_times.append(comp_val)
-        up_times.append(up_val)
+    # will be used to generate the response times of the clients
+    avg_resp_vals = (resp_var, avg_download_time, avg_computation_time, avg_upload_time)
 
 
     def homo(dev):
+        avg_dataset_vals = (avg_data_update, 2, 5, 0, 10, dev)
         for i in range(15):
             client_name = f"client_{i}"
-            dfl.generate_client_data(2, 5, 10, 0, 10, dev, client_name)
-            clients.append(cl.Client(name=client_name, download_time=down_times[i], 
-                                        computation_time=comp_times[i], upload_time=up_times[i], 
-                                        CS_algo = exp_CS_algo, dataset=ctl.csv_to_list(client_name)))
+            clients.append(cl.Client(client_name, exp_CS_algo, 10, avg_resp_vals, avg_dataset_vals))
             
     def semi_homo(dev):
         for i in range(15):
@@ -139,10 +122,8 @@ async def main():
                 slope = 1
                 constant = 5
             client_name = f"client_{i}"
-            dfl.generate_client_data(slope, constant, 10, 0, 10, dev, client_name)
-            clients.append(cl.Client(name=client_name, download_time=down_times[i], 
-                                        computation_time=comp_times[i], upload_time=up_times[i], 
-                                        CS_algo = exp_CS_algo, dataset=ctl.csv_to_list(client_name)))
+            avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
+            clients.append(cl.Client(client_name, exp_CS_algo, 10, avg_resp_vals, avg_dataset_vals))
             
     def hetero(dev):
         for i in range(15):
@@ -158,10 +139,8 @@ async def main():
                 slope = 2
                 constant = 5
             client_name = f"client_{i}"
-            dfl.generate_client_data(slope, constant, 10, 0, 10, dev, client_name)
-            clients.append(cl.Client(name=client_name, download_time=down_times[i], 
-                                        computation_time=comp_times[i], upload_time=up_times[i], 
-                                        CS_algo = exp_CS_algo, dataset=ctl.csv_to_list(client_name)))
+            avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
+            clients.append(cl.Client(client_name, exp_CS_algo, 10, avg_resp_vals, avg_dataset_vals))
 
     if exp_type == "homo_low_dev":
         homo(1)
