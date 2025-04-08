@@ -56,7 +56,7 @@ python run_experiment.py
 
 **Logging**
 
-**Simulation-time client attribute updates**
+**Simulation-time client attribute updates** ✅
 
 **Global seed for randomization**
 

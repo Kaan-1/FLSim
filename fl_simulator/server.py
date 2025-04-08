@@ -38,7 +38,13 @@ class Server:
         self.init_model_weights()
         client_updates = None
         for i in range(no_of_rounds):
-            print("\nRound: ", i, "\t\tCurrent model weights: ()", self.slope, ", ", self.constant)
+
+            # tells the clients to update their attributes at the start of each round
+            # in the real life setting, the server is not responsible for this
+            # done this way to simulate real life
+            self.update_client_attributes()
+
+            print("\nRound: ", i, "\nCurrent model weights: ", self.slope, ", ", self.constant)
             self.update_client_scores(client_updates)
             client_updates = await self.request_updates()
             self.aggregate_updates(client_updates)
@@ -98,3 +104,8 @@ class Server:
         # Apply the updates with learning rate
         self.slope += self.learning_rate * avg_slope_update
         self.constant += self.learning_rate * avg_constant_update
+
+
+    def update_client_attributes(self):
+        for client in list(self.client_scores.keys()):
+            client.update_atts()
