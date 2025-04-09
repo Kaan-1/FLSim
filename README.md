@@ -60,7 +60,7 @@ python run_experiment.py
 
 **Global seed for randomization** ✅
 
-**Add requirements file**
+**Add requirements file** ✅
 
 **UI**
 
