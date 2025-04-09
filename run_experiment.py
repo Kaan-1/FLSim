@@ -5,8 +5,12 @@ import fl_simulator.server as sv
 import fl_simulator.client as cl
 import asyncio
 import pprint
+import logger
 
 async def main():
+
+    # reset the logs to get ready to log new stuff :)
+    logger.reset_logs()
 
     #######################################################################
     ####################### VARIABLE SPOT START ###########################
@@ -23,7 +27,7 @@ async def main():
         # semi_homo_high_dev 
         # hetero_low_dev 
         # hetero_high_dev
-    exp_type = "hetero_low_dev"
+    exp_type = "homo_low_dev"
 
 
     # type of CS algorithm to be tested in the simulation
@@ -32,7 +36,7 @@ async def main():
         # threshold
         # reputation
         # multi
-    exp_CS_algo = "loss"
+    exp_CS_algo = "reputation"
 
 
     # variance of response times that the clients will have
@@ -86,10 +90,24 @@ async def main():
     ####################### VARIABLE SPOT END #############################
     #######################################################################
 
+    # log the picked variables
+    logger.log("PICKED VARIABLES FOR THE EXPERIMENT")
+    logger.log(f"Dataset type: {exp_type}")
+    logger.log(f"Client selection algorithm: {exp_CS_algo}")
+    logger.log(f"Response variance of clients: {resp_var}")
+    logger.log(f"Average download time of clients: {avg_download_time}")
+    logger.log(f"Average computation time of clients: {avg_computation_time}")
+    logger.log(f"Average upload time of clients: {avg_upload_time}")
+    logger.log(f"Average data update per round of clients' datasets: {avg_data_update}")
+    logger.log(f"Learning rate: {learning_rate}")
+    logger.log(f"Number of rounds: {no_of_rounds}")
+    logger.log(f"Number of picked clients per round: {no_of_cln}")
+    logger.log(f"Response time threshold: {threshold}\n\n\n\n\n")
+
     print(f"Running {exp_type} experiment with client selection algorithm: {exp_CS_algo}")
 
     # randomly generate data for clients, and then create the clients
-    print("Creating clients.")
+    print("Creating clients")
     clients = []
 
     # will be used to generate the response times of the clients
@@ -158,15 +176,18 @@ async def main():
         raise KeyError("Invalid experiment type.")
     
     # create the server
+    print("Creating the server")
     server = sv.Server(exp_CS_algo, learning_rate, no_of_clients=no_of_cln, threshold=threshold)
 
     # add the clients to the server
+    print("Adding the clients to the server")
     for client in clients:
         server.add_client(client, 10)
 
     # train the model
+    print(f"Training the model for {no_of_rounds} rounds with learning rate {learning_rate}\n")
     await server.train_model(no_of_rounds)
-    
+
     # print model results
     print("Calculated global model slope is: ", server.slope)
     print("Calculated global model constant is: ", server.constant)

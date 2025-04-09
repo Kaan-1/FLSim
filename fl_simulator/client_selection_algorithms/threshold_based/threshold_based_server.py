@@ -24,12 +24,6 @@ async def request_updates(server):
         if result != False:     # clients return false if they can't reach the deadline
             client_updates[client_list[i]] = result
 
-    # print selected client names
-    selected_client_names = []
-    for client in client_updates.keys():
-        selected_client_names.append(client.name)
-    print("Selected clients are:", selected_client_names)
-
     return client_updates
 
 

@@ -32,11 +32,6 @@ async def request_updates(server):
     for i, result in enumerate(results):
         client_updates[selected_clients[i]] = result
 
-    selected_client_names = []
-    for client in selected_clients:
-        selected_client_names.append(client.name)
-    print("Selected clients are:", selected_client_names)
-
     return client_updates
 
 

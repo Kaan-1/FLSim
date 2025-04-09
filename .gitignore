@@ -175,3 +175,6 @@ data_generator/syntetic_data/*.csv
 
 # file for unit testing small python things
 deneme.py
+
+# experiment trace
+experiment_trace.txt

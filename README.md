@@ -54,7 +54,7 @@ python run_experiment.py
 - hetero_low_dev ✅
 - hetero_low_dev ✅
 
-**Logging**
+**Logging** ✅
 
 **Simulation-time client attribute updates** ✅
 

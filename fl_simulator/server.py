@@ -17,6 +17,12 @@ from .client_selection_algorithms.threshold_based import threshold_based_server 
 from .client_selection_algorithms.reputation_based import reputation_based_server as CS_reputation
 from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_server as CS_multi_criteria
 
+# import the logger from one directory above
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import logger
+
 class Server:
 
     # float slope: slope of the aggregated line model (a of ax+b)
@@ -35,19 +41,33 @@ class Server:
         self.constant = np.random.normal(0, 0.01)
 
     async def train_model(self, no_of_rounds):
+        print("Initializing global model weights\n")
         self.init_model_weights()
         client_updates = None
+
+        # log the state at the start
+        logger.log("START")
+        self.log_state()
+
         for i in range(no_of_rounds):
+            print(f"Training round: {i}")
 
             # tells the clients to update their attributes at the start of each round
             # in the real life setting, the server is not responsible for this
             # done this way to simulate real life
             self.update_client_attributes()
 
-            print("\nRound: ", i, "\nCurrent model weights: ", self.slope, ", ", self.constant)
+            print("Updating client scores")
             self.update_client_scores(client_updates)
+
+            print("Requesting local updates from clients")
             client_updates = await self.request_updates()
+
+            print("Aggregating the updates\n")
             self.aggregate_updates(client_updates)
+
+            logger.log(f"ROUND {i} END")
+            self.log_state(client_updates)        # log the state of clients and server at the end of each round
 
     def add_client(self, client_obj, init_weigth):
         self.client_scores[client_obj] = init_weigth
@@ -109,3 +129,26 @@ class Server:
     def update_client_attributes(self):
         for client in list(self.client_scores.keys()):
             client.update_atts()
+
+    
+    # client updates are used to get the picked clients of the round
+    def log_state(self, client_updates = None):
+        if client_updates != None:
+            logger.log("\nClient Updates")
+            for client, update in client_updates.items():
+                logger.log(f"{client.name} update: {update[0]:.3f}, {update[1]:.3f}")
+        
+        logger.log("\nClient Scores")
+        for client, score in self.client_scores.items():
+            logger.log(f"{client.name} score: {score}")
+
+        logger.log("\nClient Datasets")
+        for client in self.client_scores.keys():
+            logger.log(f"{client.name} dataset: {client.dataset}")
+        
+        logger.log("\nClient Response Times")
+        logger.log("Results are given in the format: download_time + computation_time + upload_time = response time")
+        for client in self.client_scores.keys():
+            logger.log(f"{client.name} response time: {client.download_time:.3f} + {client.computation_time:.3f} + {client.upload_time:.3f} = {(client.download_time+client.computation_time+client.upload_time):.3f}")
+
+        logger.log("\n\n\n\n\n")
