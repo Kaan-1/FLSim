@@ -50,7 +50,7 @@ class Server:
         self.log_state()
 
         for i in range(no_of_rounds):
-            print(f"Training round: {i}")
+            print(f"Training round: {i+1}")
 
             # tells the clients to update their attributes at the start of each round
             # in the real life setting, the server is not responsible for this
@@ -66,7 +66,7 @@ class Server:
             print("Aggregating the updates\n")
             self.aggregate_updates(client_updates)
 
-            logger.log(f"ROUND {i} END")
+            logger.log(f"ROUND {i+1} END")
             self.log_state(client_updates)        # log the state of clients and server at the end of each round
 
     def add_client(self, client_obj, init_weigth):
@@ -150,5 +150,9 @@ class Server:
         logger.log("Results are given in the format: download_time + computation_time + upload_time = response time")
         for client in self.client_scores.keys():
             logger.log(f"{client.name} response time: {client.download_time:.3f} + {client.computation_time:.3f} + {client.upload_time:.3f} = {(client.download_time+client.computation_time+client.upload_time):.3f}")
+
+        logger.log("\nGlobal Model")
+        logger.log(f"Slope: {self.slope}")
+        logger.log(f"Constant: {self.constant}")
 
         logger.log("\n\n\n\n\n")

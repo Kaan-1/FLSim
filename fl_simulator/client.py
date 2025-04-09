@@ -34,7 +34,10 @@ class Client:
         # avg_att_vals[1] -> average download time
         # avg_att_vals[2] -> average computation time
         # avg_att_vals[3] -> average upload time
-        self.avg_resp_vals = avg_resp_vals
+        # using avg_resp_vals, create the average response values for this client
+        # this way, each client will have different average response values, centered around avg_resp_vals
+        # needed for healthy results in the reputation based CS
+        self.avg_resp_vals = self.get_modified_avg_resp_vals(avg_resp_vals)
 
         # avg_data_vals[0] -> average dataset increase/decrease per round
         # avg_data_vals[1] -> average slope
@@ -117,3 +120,12 @@ class Client:
         indices_to_remove = random.sample(range(len(self.dataset)), no_of_ent_to_remove)
         for i in sorted(indices_to_remove, reverse=True):
             self.dataset.pop(i)
+
+
+    # gets a tuple of size 4
+    # randomizes the elements with the indeces 1, 2, 3 wrt to 0
+    def get_modified_avg_resp_vals(self, avg_resp_val):
+        avg_down_time = np.random.normal(loc=avg_resp_val[1], scale = avg_resp_val[0])
+        avg_comp_time = np.random.normal(loc=avg_resp_val[2], scale = avg_resp_val[0])
+        avg_up_time = np.random.normal(loc=avg_resp_val[3], scale = avg_resp_val[0])
+        return (avg_resp_val[0], avg_down_time, avg_comp_time, avg_up_time)

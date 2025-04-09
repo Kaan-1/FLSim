@@ -56,19 +56,19 @@ async def main():
         # low: 0.25
         # mid: 1
         # high: 5
-    resp_var = 0.01
+    resp_var = 0.1
 
 
     # average download time of clients
-    avg_download_time = 0.01
+    avg_download_time = 0.1
 
 
     # average computation time of clients
-    avg_computation_time = 0.04
+    avg_computation_time = 0.4
 
 
     # average upload time of clients
-    avg_upload_time = 0.02
+    avg_upload_time = 0.2
 
 
     # average number of entries to be deleted/added per round for clients
@@ -76,7 +76,7 @@ async def main():
 
 
     # Learning rate of the ML algorithm
-    learning_rate = 0.1
+    learning_rate = 0.5
 
 
     # no of rounds to train the model
@@ -92,7 +92,7 @@ async def main():
     # Time limit that clients are allowed to compute their updates in
     # Only used in threshold based client selection
     # Have to make it None otherwise, because of the current implementation
-    threshold = 0.04
+    threshold = 0.4
     if exp_CS_algo != "threshold":
         threshold = None
 
