@@ -58,7 +58,7 @@ python run_experiment.py
 
 **Simulation-time client attribute updates** ✅
 
-**Global seed for randomization**
+**Global seed for randomization** ✅
 
 **Add requirements file**
 

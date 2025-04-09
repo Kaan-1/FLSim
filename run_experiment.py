@@ -1,6 +1,15 @@
 # This experiment performs FL on 15 clients
 # The picked ML model is 2D linear regression
 # The line we want to reach is 2x+5
+
+# SET THE SEED OF THE EXPERIMENT HERE
+seed = 2
+
+import random
+import numpy
+random.seed(seed)
+numpy.random.seed(seed)
+
 import fl_simulator.server as sv
 import fl_simulator.client as cl
 import asyncio
@@ -18,6 +27,9 @@ async def main():
 
 
 
+    # experiment seed
+    seed = 2
+
     # type of dataset to be used for clients
     # detalied information about the datasets can be found in the readme
     # possible values include: 
@@ -25,7 +37,7 @@ async def main():
         # homo_high_dev 
         # semi_homo_low_dev
         # semi_homo_high_dev 
-        # hetero_low_dev 
+        # hetero_low_dev
         # hetero_high_dev
     exp_type = "homo_low_dev"
 
