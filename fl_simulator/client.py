@@ -48,7 +48,7 @@ class Client:
         self.avg_data_vals = avg_data_vals
 
         # intialize the dataset
-        self.add_to_dataset(init_dataset_size)
+        self.add_to_dataset(init_dataset_size, 0)
 
         # initialize the fields of the client
         self.update_atts(False)
@@ -89,7 +89,7 @@ class Client:
 
 
     # updates download_time, upload_time, computation_time and dataset of clients
-    def update_atts(self, change_dataset = True):
+    def update_atts(self, training_round, change_dataset = True):
         self.download_time = abs(np.random.normal(loc=self.avg_resp_vals[1], 
                                                         scale=self.avg_resp_vals[0]))
         self.computation_time = abs(np.random.normal(loc=self.avg_resp_vals[2], 
@@ -99,13 +99,15 @@ class Client:
         if change_dataset:
             no_of_entry_changes = int(round(np.random.normal(loc=0, scale=self.avg_data_vals[0])))
             if no_of_entry_changes > 0:
-                self.add_to_dataset(no_of_entry_changes)
+                self.add_to_dataset(no_of_entry_changes, training_round)
             elif no_of_entry_changes < 0:
                 if abs(no_of_entry_changes) < len(self.dataset):     # don't compeletely wipe out the dataset
                     self.remove_from_dataset(abs(no_of_entry_changes))
 
 
-    def add_to_dataset(self, num_of_points):
+    # we add the training round as a time stamp to the samples added to the datasets
+    # this way, we can measure the sample freshness of clients
+    def add_to_dataset(self, num_of_points, training_round):
         interval_len = self.avg_data_vals[4] - self.avg_data_vals[3]
         step_size = interval_len / num_of_points
         step = 0
@@ -113,7 +115,7 @@ class Client:
             step += step_size
             y_val = (self.avg_data_vals[1] * step) + self.avg_data_vals[2]
             error = np.random.normal(loc=0, scale = self.avg_data_vals[5])
-            self.dataset.append([step, y_val+error])
+            self.dataset.append([step, y_val+error, training_round])
 
 
     def remove_from_dataset(self, no_of_ent_to_remove):

@@ -1,5 +1,6 @@
 # implements the request_updates() and update_client_weights() methods of the server wrt multi criteria based algorithm
 import asyncio
+import math
 
 async def request_updates(server):
     client_updates = {}
@@ -13,7 +14,7 @@ async def request_updates(server):
     client_to_score = {}
     stats = get_stats(client_list)
     for client in client_list:
-        client_to_score[client] = calc_m_score(client, stats)
+        client_to_score[client] = calc_m_score(client, stats, server.training_round)
     sorted_clients = sorted(client_to_score.keys(), key=lambda client: client_to_score[client])
     selected_clients = sorted_clients[:min(server.no_of_clients, len(sorted_clients))]
     
@@ -42,14 +43,14 @@ def update_client_scores(server, client_updates):
 
 
 # calculates the score of client using multiple criterias
-# Criterias: downloading time, training time, uploading time, dataset size
-# TO DO: add sample freshness as well
-def calc_m_score(client, stats):
+# Criterias: downloading time, training time, uploading time, dataset size, sample freshness
+def calc_m_score(client, stats, training_round):
     down_score = client.download_time / stats[0]
     comp_score = client.computation_time / stats[1]
     up_score = client.upload_time / stats[2]
-    data_score = len(client.dataset) / stats[2]
-    score = down_score + comp_score + up_score + data_score
+    data_score = len(client.dataset) / stats[3]
+    sample_freshness_score = calc_sample_freshness_score(client.dataset, training_round)
+    score = down_score + comp_score + up_score + data_score + sample_freshness_score
     return score
 
 
@@ -61,3 +62,12 @@ def get_stats(client_list):
     avg_up_time = sum(client.upload_time for client in client_list) / len(client_list)
     avg_dataset_size = sum(len(client.dataset) for client in client_list) / len(client_list)
     return (avg_down_time, avg_comp_time, avg_up_time, avg_dataset_size)
+
+
+def calc_sample_freshness_score(dataset, training_round):
+    sample_freshness = 0
+    for data in dataset:
+        oldness = training_round - data[2]      # data[2] is the round that the data was added
+        freshness_score = math.exp(-oldness)
+        sample_freshness += freshness_score
+    return sample_freshness

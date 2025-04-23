@@ -35,6 +35,7 @@ class Server:
         self.no_of_clients = no_of_clients
         self.threshold = threshold
         self.client_scores = {}
+        self.training_round = 0
 
     def init_model_weights(self):
         self.slope = np.random.normal(0, 0.01)
@@ -51,11 +52,12 @@ class Server:
 
         for i in range(no_of_rounds):
             print(f"Training round: {i+1}")
+            self.training_round = i+1
 
             # tells the clients to update their attributes at the start of each round
             # in the real life setting, the server is not responsible for this
             # done this way to simulate real life
-            self.update_client_attributes()
+            self.update_client_attributes(i+1)
 
             print("Updating client scores")
             self.update_client_scores(client_updates)
@@ -126,9 +128,10 @@ class Server:
         self.constant += self.learning_rate * avg_constant_update
 
 
-    def update_client_attributes(self):
+    
+    def update_client_attributes(self, training_round):
         for client in list(self.client_scores.keys()):
-            client.update_atts()
+            client.update_atts(training_round)
 
     
     # client updates are used to get the picked clients of the round
