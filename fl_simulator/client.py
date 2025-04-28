@@ -108,20 +108,18 @@ class Client:
     # we add the training round as a time stamp to the samples added to the datasets
     # this way, we can measure the sample freshness of clients
     def add_to_dataset(self, num_of_points, training_round):
-        interval_len = self.avg_data_vals[4] - self.avg_data_vals[3]
-        step_size = interval_len / num_of_points
-        step = 0
-        for i in range(num_of_points):
-            step += step_size
-            y_val = (self.avg_data_vals[1] * step) + self.avg_data_vals[2]
+        x_vals = np.random.uniform(self.avg_data_vals[3], self.avg_data_vals[4], num_of_points)
+        for x_val in x_vals:
+            y_val = (self.avg_data_vals[1] * x_val) + self.avg_data_vals[2]
             error = np.random.normal(loc=0, scale = self.avg_data_vals[5])
-            self.dataset.append([step, y_val+error, training_round])
+            self.dataset.append([x_val, y_val+error, training_round])
 
 
+    # removes no_of_ent_to_remove oldest elements from the dataset
     def remove_from_dataset(self, no_of_ent_to_remove):
-        indices_to_remove = random.sample(range(len(self.dataset)), no_of_ent_to_remove)
-        for i in sorted(indices_to_remove, reverse=True):
-            self.dataset.pop(i)
+        self.dataset.sort(key=lambda x: x[2])
+        for i in range(no_of_ent_to_remove):
+            self.dataset.pop(0)
 
 
     # gets a tuple of size 4

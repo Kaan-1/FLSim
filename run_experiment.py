@@ -28,7 +28,7 @@ async def main():
 
 
     # experiment seed
-    seed = 2
+    seed = 3
 
     # type of dataset to be used for clients
     # detalied information about the datasets can be found in the readme
@@ -72,7 +72,7 @@ async def main():
 
 
     # average number of entries to be deleted/added per round for clients
-    avg_data_update = 2
+    avg_data_update = 1
 
 
     # Learning rate of the ML algorithm
