@@ -103,18 +103,18 @@ async def main():
     #######################################################################
 
     # log the picked variables
-    logger.log("PICKED VARIABLES FOR THE EXPERIMENT")
-    logger.log(f"Dataset type: {exp_type}")
-    logger.log(f"Client selection algorithm: {exp_CS_algo}")
-    logger.log(f"Response variance of clients: {resp_var}")
-    logger.log(f"Average download time of clients: {avg_download_time}")
-    logger.log(f"Average computation time of clients: {avg_computation_time}")
-    logger.log(f"Average upload time of clients: {avg_upload_time}")
-    logger.log(f"Average data update per round of clients' datasets: {avg_data_update}")
-    logger.log(f"Learning rate: {learning_rate}")
-    logger.log(f"Number of rounds: {no_of_rounds}")
-    logger.log(f"Number of picked clients per round: {no_of_cln}")
-    logger.log(f"Response time threshold: {threshold}\n\n\n\n\n")
+    logger.add_entry_to_dict("params", {})
+    logger.add_entry_to_dict("dataset_type", exp_type, ["params"])
+    logger.add_entry_to_dict("cs_algo", exp_CS_algo, ["params"])
+    logger.add_entry_to_dict("response_variance", resp_var, ["params"])
+    logger.add_entry_to_dict("avg_download_time", avg_download_time, ["params"])
+    logger.add_entry_to_dict("avg_computation_time", avg_computation_time, ["params"])
+    logger.add_entry_to_dict("avg_upload_time", avg_upload_time, ["params"])
+    logger.add_entry_to_dict("avg_client_data_update_per_round", avg_data_update, ["params"])
+    logger.add_entry_to_dict("learning_rate", learning_rate, ["params"])
+    logger.add_entry_to_dict("no_of_rounds", no_of_rounds, ["params"])
+    logger.add_entry_to_dict("no_of_picked_clients_per_round", no_of_cln, ["params"])
+    logger.add_entry_to_dict("response_time_threshold", threshold, ["params"])
 
     print(f"Running {exp_type} experiment with client selection algorithm: {exp_CS_algo}")
 
@@ -199,12 +199,13 @@ async def main():
     # train the model
     print(f"Training the model for {no_of_rounds} rounds with learning rate {learning_rate}\n")
     await server.train_model(no_of_rounds)
+    logger.save_logs()
 
     # print model results
     print("Calculated global model slope is: ", server.slope)
     print("Calculated global model constant is: ", server.constant)
-    
-    pass
+
+
 
 if __name__ == "__main__":
     asyncio.run(main())

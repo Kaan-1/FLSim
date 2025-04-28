@@ -46,9 +46,11 @@ class Server:
         self.init_model_weights()
         client_updates = None
 
+        # initialize the log results
+        logger.add_entry_to_dict("results", {})
+
         # log the state at the start
-        logger.log("START")
-        self.log_state()
+        self.log_state("init")
 
         for i in range(no_of_rounds):
             print(f"Training round: {i+1}")
@@ -68,17 +70,22 @@ class Server:
             print("Aggregating the updates\n")
             self.aggregate_updates(client_updates)
 
-            logger.log(f"ROUND {i+1} END")
-            self.log_state(client_updates)        # log the state of clients and server at the end of each round
+            self.log_state(f"round_{i+1}")
+
+
 
     def add_client(self, client_obj, init_weigth):
         self.client_scores[client_obj] = init_weigth
+
+
 
     def remove_client(self, client_name):
         for client in self.client_scores.keys():
             if client.name == client_name:
                 del self.client_scores[client]
                 break
+
+
 
     # sends current model parameters to clients, waits for their response
     # int s: no of clients to be picked
@@ -95,6 +102,7 @@ class Server:
         return client_updates
 
 
+
     # updates the weights of the clients (0=not picked, 1=fully picked)
     def update_client_scores(self, client_updates):
         if self.CS_algo == "loss":
@@ -105,6 +113,8 @@ class Server:
             CS_reputation.update_client_scores(self, client_updates)
         else:   # self.CS_algo == "multi"
             CS_multi_criteria.update_client_scores(self,client_updates)
+
+
 
     def aggregate_updates(self, client_updates):
         # Extract all slope and constant updates from client_updates
@@ -135,27 +145,37 @@ class Server:
 
     
     # client updates are used to get the picked clients of the round
-    def log_state(self, client_updates = None):
+    # client_updates defaults to None, to take care of the initialization round, where \
+        # clients don't send any data
+    # round_name is usually one of init, round_1, round_2 etc...
+    # logger.add_entry_to_dict(, , ["results", round_name])
+    def log_state(self, round_name, client_updates = None):
+        logger.add_entry_to_dict(round_name, {}, ["results"])
         if client_updates != None:
-            logger.log("\nClient Updates")
+            logger.add_entry_to_dict("updates", {}, ["results", round_name])
             for client, update in client_updates.items():
-                logger.log(f"{client.name} update: {update[0]:.3f}, {update[1]:.3f}")
+                logger.add_entry_to_dict(client.name, update, ["results", round_name, "updates"])
         
-        logger.log("\nClient Scores")
+        logger.add_entry_to_dict("scores", {}, ["results", round_name])
+        logger.add_entry_to_dict("datasets", {}, ["results", round_name])
+        logger.add_entry_to_dict("download_times", {}, ["results", round_name])
+        logger.add_entry_to_dict("computation_times", {}, ["results", round_name])
+        logger.add_entry_to_dict("upload_times", {}, ["results", round_name])
+        logger.add_entry_to_dict("response_times", {}, ["results", round_name])
         for client, score in self.client_scores.items():
-            logger.log(f"{client.name} score: {score}")
+            logger.add_entry_to_dict(client.name, score, ["results", round_name, "scores"])
+            logger.add_entry_to_dict(client.name, client.dataset, 
+                                        ["results", round_name, "datasets"])
+            logger.add_entry_to_dict(client.name, client.download_time, 
+                                        ["results", round_name, "download_times"])
+            logger.add_entry_to_dict(client.name, client.computation_time, 
+                                        ["results", round_name, "computation_times"])
+            logger.add_entry_to_dict(client.name, client.upload_time, 
+                                        ["results", round_name, "upload_times"])
+            logger.add_entry_to_dict(client.name, 
+                                        client.download_time + client.computation_time + client.upload_time, 
+                                        ["results", round_name, "response_times"])
 
-        logger.log("\nClient Datasets")
-        for client in self.client_scores.keys():
-            logger.log(f"{client.name} dataset: {client.dataset}")
-        
-        logger.log("\nClient Response Times")
-        logger.log("Results are given in the format: download_time + computation_time + upload_time = response time")
-        for client in self.client_scores.keys():
-            logger.log(f"{client.name} response time: {client.download_time:.3f} + {client.computation_time:.3f} + {client.upload_time:.3f} = {(client.download_time+client.computation_time+client.upload_time):.3f}")
-
-        logger.log("\nGlobal Model")
-        logger.log(f"Slope: {self.slope}")
-        logger.log(f"Constant: {self.constant}")
-
-        logger.log("\n\n\n\n\n")
+        logger.add_entry_to_dict("global_model", {}, ["results", round_name])
+        logger.add_entry_to_dict("slope", self.slope, ["results", round_name, "global_model"])
+        logger.add_entry_to_dict("constant", self.constant, ["results", round_name, "global_model"])

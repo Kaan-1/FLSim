@@ -51,7 +51,7 @@ class Client:
         self.add_to_dataset(init_dataset_size, 0)
 
         # initialize the fields of the client
-        self.update_atts(False)
+        self.update_atts(0, False)
 
 
     # for debugging purposes
