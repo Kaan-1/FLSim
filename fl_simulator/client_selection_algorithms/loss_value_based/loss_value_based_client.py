@@ -14,8 +14,10 @@ def get_updates(client, global_model_slope, global_model_constant):
     numerator = np.sum((x - x_mean) * (y - y_mean))
     denominator = np.sum((x - x_mean) ** 2)
     
+    MIN_DENOMINATOR = 1e-3
+
     # Handle the case where denominator is zero (all x values are the same)
-    if denominator == 0:
+    if denominator < MIN_DENOMINATOR:
         client_slope = 0
     else:
         client_slope = numerator / denominator
@@ -32,5 +34,11 @@ def get_updates(client, global_model_slope, global_model_constant):
     
     # Calculate Mean Squared Residual Error (MSRE)
     loss_value = np.mean((y - y_pred) ** 2)
+
+    # outlier detection
+    if abs(slope_update) > 10:
+        slope_update = 0
+    if abs(constant_update) > 10:
+        constant_update = 0
     
     return (slope_update, constant_update, loss_value)

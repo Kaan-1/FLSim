@@ -18,7 +18,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fl_simulator.server as sv
 import fl_simulator.client as cl
 import asyncio
-import pprint
 import logger.logger as lg
 
 async def run_exp(experiment_type=None, experiment_CS_algo=None):
@@ -58,19 +57,19 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
         # low: 0.25
         # mid: 1
         # high: 5
-    resp_var = 0.1
+    resp_var = 0.01
 
 
     # average download time of clients
-    avg_download_time = 0.1
+    avg_download_time = 0.01
 
 
     # average computation time of clients
-    avg_computation_time = 0.4
+    avg_computation_time = 0.04
 
 
     # average upload time of clients
-    avg_upload_time = 0.2
+    avg_upload_time = 0.02
 
 
     # average number of entries to be deleted/added per round for clients
@@ -78,11 +77,11 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
 
 
     # Learning rate of the ML algorithm
-    learning_rate = 0.5
+    learning_rate = 0.05
 
 
     # no of rounds to train the model
-    no_of_rounds = 10
+    no_of_rounds = 100
 
 
     # number of clients to be picked each round
@@ -94,7 +93,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     # Time limit that clients are allowed to compute their updates in
     # Only used in threshold based client selection
     # Have to make it None otherwise, because of the current implementation
-    threshold = 0.4
+    threshold = 0.04
     if exp_CS_algo != "threshold":
         threshold = None
 
