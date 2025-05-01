@@ -11,7 +11,6 @@
 
 import asyncio
 import numpy as np
-import random
 from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
 from .client_selection_algorithms.threshold_based import threshold_based_client as CS_threshold
 from .client_selection_algorithms.reputation_based import reputation_based_client as CS_reputation

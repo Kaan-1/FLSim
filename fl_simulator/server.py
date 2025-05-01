@@ -17,24 +17,20 @@ from .client_selection_algorithms.threshold_based import threshold_based_server 
 from .client_selection_algorithms.reputation_based import reputation_based_server as CS_reputation
 from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_server as CS_multi_criteria
 
-# import the logger from one directory above
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import logger
-
 class Server:
 
     # float slope: slope of the aggregated line model (a of ax+b)
     # float constant: constant of the aggreagated line model (b of ax+b)
     # Dict(Client->int) clients: a dictionary of clients together with their weights
     # int no_of_clients: number of clients to be picked in each iteration 
-    def __init__(self, CS_algo: str, learning_rate: float, no_of_clients=None, threshold=None):
+    def __init__(self, CS_algo: str, learning_rate: float, no_of_clients=None, threshold=None, logger=None, dataset_type=None):
         self.CS_algo = CS_algo
         self.learning_rate = learning_rate
         self.no_of_clients = no_of_clients
         self.threshold = threshold
         self.client_scores = {}
+        self.logger = logger
+        self.dataset_type = dataset_type
         self.training_round = 0
 
     def init_model_weights(self):
@@ -42,18 +38,17 @@ class Server:
         self.constant = np.random.normal(0, 0.01)
 
     async def train_model(self, no_of_rounds):
-        print("Initializing global model weights\n")
         self.init_model_weights()
         client_updates = None
 
         # initialize the log results
-        logger.add_entry_to_dict("results", {})
+        self.logger.add_entry_to_dict("results", {})
 
         # log the state at the start
         self.log_state("init")
 
         for i in range(no_of_rounds):
-            print(f"Training round: {i+1}")
+            print(f"[{self.dataset_type}+{self.CS_algo}]" .ljust(32), f"is on round {i+1}")
             self.training_round = i+1
 
             # tells the clients to update their attributes at the start of each round
@@ -61,16 +56,13 @@ class Server:
             # done this way to simulate real life
             self.update_client_attributes(i+1)
 
-            print("Updating client scores")
             self.update_client_scores(client_updates)
 
-            print("Requesting local updates from clients")
             client_updates = await self.request_updates()
 
-            print("Aggregating the updates\n")
             self.aggregate_updates(client_updates)
 
-            self.log_state(f"round_{i+1}")
+            self.log_state(f"round_{i+1}", client_updates)
 
 
 
@@ -150,32 +142,32 @@ class Server:
     # round_name is usually one of init, round_1, round_2 etc...
     # logger.add_entry_to_dict(, , ["results", round_name])
     def log_state(self, round_name, client_updates = None):
-        logger.add_entry_to_dict(round_name, {}, ["results"])
+        self.logger.add_entry_to_dict(round_name, {}, ["results"])
         if client_updates != None:
-            logger.add_entry_to_dict("updates", {}, ["results", round_name])
+            self.logger.add_entry_to_dict("updates", {}, ["results", round_name])
             for client, update in client_updates.items():
-                logger.add_entry_to_dict(client.name, update, ["results", round_name, "updates"])
+                self.logger.add_entry_to_dict(client.name, update, ["results", round_name, "updates"])
         
-        logger.add_entry_to_dict("scores", {}, ["results", round_name])
-        logger.add_entry_to_dict("datasets", {}, ["results", round_name])
-        logger.add_entry_to_dict("download_times", {}, ["results", round_name])
-        logger.add_entry_to_dict("computation_times", {}, ["results", round_name])
-        logger.add_entry_to_dict("upload_times", {}, ["results", round_name])
-        logger.add_entry_to_dict("response_times", {}, ["results", round_name])
+        self.logger.add_entry_to_dict("scores", {}, ["results", round_name])
+        self.logger.add_entry_to_dict("datasets", {}, ["results", round_name])
+        self.logger.add_entry_to_dict("download_times", {}, ["results", round_name])
+        self.logger.add_entry_to_dict("computation_times", {}, ["results", round_name])
+        self.logger.add_entry_to_dict("upload_times", {}, ["results", round_name])
+        self.logger.add_entry_to_dict("response_times", {}, ["results", round_name])
         for client, score in self.client_scores.items():
-            logger.add_entry_to_dict(client.name, score, ["results", round_name, "scores"])
-            logger.add_entry_to_dict(client.name, client.dataset, 
+            self.logger.add_entry_to_dict(client.name, score, ["results", round_name, "scores"])
+            self.logger.add_entry_to_dict(client.name, client.dataset, 
                                         ["results", round_name, "datasets"])
-            logger.add_entry_to_dict(client.name, client.download_time, 
+            self.logger.add_entry_to_dict(client.name, client.download_time, 
                                         ["results", round_name, "download_times"])
-            logger.add_entry_to_dict(client.name, client.computation_time, 
+            self.logger.add_entry_to_dict(client.name, client.computation_time, 
                                         ["results", round_name, "computation_times"])
-            logger.add_entry_to_dict(client.name, client.upload_time, 
+            self.logger.add_entry_to_dict(client.name, client.upload_time, 
                                         ["results", round_name, "upload_times"])
-            logger.add_entry_to_dict(client.name, 
+            self.logger.add_entry_to_dict(client.name, 
                                         client.download_time + client.computation_time + client.upload_time, 
                                         ["results", round_name, "response_times"])
 
-        logger.add_entry_to_dict("global_model", {}, ["results", round_name])
-        logger.add_entry_to_dict("slope", self.slope, ["results", round_name, "global_model"])
-        logger.add_entry_to_dict("constant", self.constant, ["results", round_name, "global_model"])
+        self.logger.add_entry_to_dict("global_model", {}, ["results", round_name])
+        self.logger.add_entry_to_dict("slope", self.slope, ["results", round_name, "global_model"])
+        self.logger.add_entry_to_dict("constant", self.constant, ["results", round_name, "global_model"])
