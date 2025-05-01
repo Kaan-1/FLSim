@@ -43,6 +43,50 @@ def plot_graphs():
         plt.savefig(filepath)
         plt.close()
 
+    # go through a subset of dict list, get the time bar graph
+    x_vals = ["loss", "threshold", "reputation", "multi"]
+    y_vals = []
+    for x_val in x_vals:
+        for result_dict in dict_list:
+            if result_dict["params"]["cs_algo"] == x_val and \
+                    result_dict["params"]["dataset_type"] == "homo_low_dev":
+                time = calculate_total_time(result_dict, x_val)
+                y_vals.append(time)
+    plt.bar(x_vals, y_vals)
+    plt.title("Total time of training")
+    plt.xlabel("Seconds")
+    plt.ylabel("CS Algorithm")
+    file_path = os.path.join(output_dir, "total_times.png")
+    plt.savefig(file_path)
+    plt.close()
+
+
+
+# time calculation is different for loss vs others
+# in loss, the server waits for every client, every round
+# others only wait for the picked clients
+def calculate_total_time(result_dict, cs_algo):
+    total = 0
+    if cs_algo == "loss":
+        # get all client's response times
+        for round_name, stats in result_dict["results"].items():
+            if round_name != "init":
+                response_times = []
+                for client_name, response_time in result_dict["results"][round_name]["response_times"].items():
+                    response_times.append(response_time)
+                # add the max
+                total += max(response_times)
+    else:
+        for round_name, stats in result_dict["results"].items():
+            if round_name != "init":
+                # get their response times
+                response_times = []
+                for client_name in result_dict["results"][round_name]["updates"]:
+                    response_times.append(result_dict["results"][round_name]["response_times"][client_name])
+                # pick the maximum one
+                total += max(response_times)
+    return total
+
 
 
 # creates and returns a syntetic validation dataset, consisting of points around the 2x+5 line
