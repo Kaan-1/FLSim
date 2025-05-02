@@ -3,7 +3,7 @@
 # The line we want to reach is 2x+5
 
 # SET THE SEED OF THE EXPERIMENT HERE
-seed = 3
+seed = 2
 
 import random
 import numpy
@@ -87,7 +87,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     # number of clients to be picked each round
     # Redundant for some of the CS algorihms, such as threshold based CS
     # Total number of clients is 15
-    no_of_cln = 10
+    no_of_cln = 8
 
 
     # Time limit that clients are allowed to compute their updates in

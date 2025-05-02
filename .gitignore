@@ -182,3 +182,6 @@ experiment_trace.json
 
 # logger results
 logger/results/
+
+# plotter
+plot/output/

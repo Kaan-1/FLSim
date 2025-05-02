@@ -28,13 +28,22 @@ def plot_graphs():
             data = json.load(f)
             dict_list.append(data)
 
+    # define the colors of cs algorithms
+    cs_algo_colors = {
+        "loss": "blue",
+        "threshold": "red",
+        "reputation": "green",
+        "multi": "purple"
+    }
+
     # go through the dict list, get the MSRE plots
     for data_type in exp_data_types:
         x_vals = get_x_vals(dict_list[0])
         for result_dict in dict_list:
             if result_dict["params"]["dataset_type"] == data_type:
                 y_vals = get_y_vals(result_dict, validation_dataset)
-                plt.plot(x_vals, y_vals, label=result_dict["params"]["cs_algo"])
+                algo = result_dict["params"]["cs_algo"]
+                plt.plot(x_vals, y_vals, label=algo, color=cs_algo_colors[algo])
         plt.title(f"Error rates on {data_type}")
         plt.xlabel("Rounds")
         plt.ylabel("MRSE")
@@ -52,7 +61,8 @@ def plot_graphs():
                     result_dict["params"]["dataset_type"] == "homo_low_dev":
                 time = calculate_total_time(result_dict, x_val)
                 y_vals.append(time)
-    plt.bar(x_vals, y_vals)
+    colors = [cs_algo_colors[algo] for algo in x_vals]
+    plt.bar(x_vals, y_vals, color=colors)
     plt.title("Total time of training")
     plt.xlabel("Seconds")
     plt.ylabel("CS Algorithm")
