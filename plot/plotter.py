@@ -64,8 +64,8 @@ def plot_graphs():
     colors = [cs_algo_colors[algo] for algo in x_vals]
     plt.bar(x_vals, y_vals, color=colors)
     plt.title("Total time of training")
-    plt.xlabel("Seconds")
-    plt.ylabel("CS Algorithm")
+    plt.xlabel("CS Algorithms")
+    plt.ylabel("Seconds")
     file_path = os.path.join(output_dir, "total_times.png")
     plt.savefig(file_path)
     plt.close()
