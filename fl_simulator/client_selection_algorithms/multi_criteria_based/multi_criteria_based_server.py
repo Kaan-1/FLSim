@@ -15,7 +15,7 @@ async def request_updates(server):
     stats = get_stats(client_list)
     for client in client_list:
         client_to_score[client] = calc_m_score(client, stats, server.training_round)
-    sorted_clients = sorted(client_to_score.keys(), key=lambda client: client_to_score[client])
+    sorted_clients = sorted(client_to_score.keys(), key=lambda client: client_to_score[client], reverse=True)
     selected_clients = sorted_clients[:min(server.no_of_clients, len(sorted_clients))]
     
     # request updates from clients
@@ -45,9 +45,9 @@ def update_client_scores(server, client_updates):
 # calculates the score of client using multiple criterias
 # Criterias: downloading time, training time, uploading time, dataset size, sample freshness
 def calc_m_score(client, stats, training_round):
-    down_score = client.download_time / stats[0]
-    comp_score = client.computation_time / stats[1]
-    up_score = client.upload_time / stats[2]
+    down_score = stats[0] / client.download_time
+    comp_score = stats[1] / client.computation_time
+    up_score = stats[2] / client.upload_time
     data_score = len(client.dataset) / stats[3]
     sample_freshness_score = calc_sample_freshness_score(client.dataset, training_round)
     score = down_score + comp_score + up_score + data_score + sample_freshness_score

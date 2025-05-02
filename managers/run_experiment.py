@@ -3,7 +3,7 @@
 # The line we want to reach is 2x+5
 
 # SET THE SEED OF THE EXPERIMENT HERE
-seed = 2
+seed = 6
 
 import random
 import numpy
