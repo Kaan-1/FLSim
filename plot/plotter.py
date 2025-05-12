@@ -33,7 +33,8 @@ def plot_graphs():
         "loss": "blue",
         "threshold": "red",
         "reputation": "green",
-        "multi": "purple"
+        "multi": "purple",
+        "random": "orange"
     }
 
     # go through the dict list, get the MSRE plots
@@ -53,7 +54,7 @@ def plot_graphs():
         plt.close()
 
     # go through a subset of dict list, get the time bar graph
-    x_vals = ["loss", "threshold", "reputation", "multi"]
+    x_vals = ["loss", "threshold", "reputation", "multi", "random"]
     y_vals = []
     for x_val in x_vals:
         for result_dict in dict_list:

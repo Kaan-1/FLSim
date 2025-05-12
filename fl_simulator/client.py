@@ -15,6 +15,7 @@ from .client_selection_algorithms.loss_value_based import loss_value_based_clien
 from .client_selection_algorithms.threshold_based import threshold_based_client as CS_threshold
 from .client_selection_algorithms.reputation_based import reputation_based_client as CS_reputation
 from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_client as CS_multi_criteria
+from .client_selection_algorithms.random_based import random_based_client as CS_random
 
 class Client:
 
@@ -78,6 +79,8 @@ class Client:
             updates = CS_threshold.get_updates(self, global_model_slope, global_model_constant, threshold)
         elif self.CS_algo == "reputation":
             updates = CS_reputation.get_updates(self, global_model_slope, global_model_constant)
+        elif self.CS_algo == "random":
+            updates = CS_random.get_updates(self, global_model_slope, global_model_constant)
         else:   # self.CS_algo == "multi"
             updates = CS_multi_criteria.get_updates(self, global_model_slope, global_model_constant)
 

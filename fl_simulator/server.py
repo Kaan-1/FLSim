@@ -16,6 +16,7 @@ from .client_selection_algorithms.loss_value_based import loss_value_based_serve
 from .client_selection_algorithms.threshold_based import threshold_based_server as CS_threshold
 from .client_selection_algorithms.reputation_based import reputation_based_server as CS_reputation
 from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_server as CS_multi_criteria
+from .client_selection_algorithms.random_based import random_based_server as CS_random
 
 class Server:
 
@@ -89,6 +90,8 @@ class Server:
             client_updates = await CS_threshold.request_updates(self)
         elif self.CS_algo == "reputation":
             client_updates = await CS_reputation.request_updates(self)
+        elif self.CS_algo == "random":
+            client_updates = await CS_random.request_updates(self)
         else:   # self.CS_algo == "multi"
             client_updates = await CS_multi_criteria.request_updates(self)
         return client_updates
@@ -103,6 +106,8 @@ class Server:
             CS_threshold.update_client_scores(self, client_updates)
         elif self.CS_algo == "reputation":
             CS_reputation.update_client_scores(self, client_updates)
+        elif self.CS_algo == "random":
+            CS_random.update_client_scores(self, client_updates)
         else:   # self.CS_algo == "multi"
             CS_multi_criteria.update_client_scores(self,client_updates)
 
