@@ -129,22 +129,23 @@ def get_y_vals(result_dict, validation_dataset):
     # find out the MRSE for each one of them
     y_vals = []
     for global_model in global_models:
-        rmse = calculate_rmse(validation_dataset, global_model["slope"], global_model["constant"])
-        y_vals.append(rmse)
+        mrse = calculate_mrse(validation_dataset, global_model["slope"], global_model["constant"])
+        y_vals.append(mrse)
 
     return y_vals
 
 
 
-# calculates the RMSE of validation set with respect to the line y=slope*x + constant
-def calculate_rmse(validation_dataset, slope, constant):
+# calculates the MRSE of validation set with respect to the line y=slope*x + constant
+def calculate_mrse(validation_dataset, slope, constant):
 
     x_values = np.array([x for x,y in validation_dataset])
     y_values = np.array([y for x,y in validation_dataset])
     y_pred = slope * x_values + constant
 
-    squared_errors = (y_values-y_pred) ** 2
-    mse = np.mean(squared_errors)
-    rmse = np.sqrt(mse)
+    # Calculate root of each squared error (rather than root of mean)
+    root_squared_errors = np.sqrt((y_values-y_pred) ** 2)
+    # Take the mean of the root squared errors
+    mrse = np.mean(root_squared_errors)
 
-    return rmse
+    return mrse
