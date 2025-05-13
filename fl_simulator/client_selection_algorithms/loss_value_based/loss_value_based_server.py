@@ -28,7 +28,7 @@ async def request_updates(server):
                         key=lambda client: all_updates[client][2], reverse=True)  # third att of result is loss
     
     # Select only the top server.no_of_clients clients
-    selected_clients = sorted_clients[:min(server.no_of_clients, len(sorted_clients))]
+    selected_clients = sorted_clients[:min(server.no_of_picked_clients, len(sorted_clients))]
     
     # Create the final dictionary with only the selected clients
     for client in selected_clients:

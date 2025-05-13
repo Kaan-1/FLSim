@@ -72,8 +72,12 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     avg_upload_time = 0.02
 
 
+    # initial dataset size of clients
+    cln_init_dataset_size = 100
+
+
     # average number of entries to be deleted/added per round for clients
-    avg_data_update = 1
+    avg_data_update = 10
 
 
     # Learning rate of the ML algorithm
@@ -87,7 +91,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     # number of clients to be picked each round
     # Redundant for some of the CS algorihms, such as threshold based CS
     # Total number of clients is 15
-    no_of_cln = 8
+    no_of_picked_cln = 8
 
 
     # Time limit that clients are allowed to compute their updates in
@@ -116,7 +120,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     logger.add_entry_to_dict("avg_client_data_update_per_round", avg_data_update, ["params"])
     logger.add_entry_to_dict("learning_rate", learning_rate, ["params"])
     logger.add_entry_to_dict("no_of_rounds", no_of_rounds, ["params"])
-    logger.add_entry_to_dict("no_of_picked_clients_per_round", no_of_cln, ["params"])
+    logger.add_entry_to_dict("no_of_picked_clients_per_round", no_of_picked_cln, ["params"])
     logger.add_entry_to_dict("response_time_threshold", threshold, ["params"])
 
     print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "is starting")
@@ -132,7 +136,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
         avg_dataset_vals = (avg_data_update, 2, 5, 0, 10, dev)
         for i in range(15):
             client_name = f"client_{i}"
-            clients.append(cl.Client(client_name, exp_CS_algo, 10, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
             
     def semi_homo(dev):
         for i in range(15):
@@ -155,8 +159,8 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
                 constant = 5
             client_name = f"client_{i}"
             avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, exp_CS_algo, 10, avg_resp_vals, avg_dataset_vals))
-            
+            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+    
     def hetero(dev):
         for i in range(15):
             slope = None
@@ -172,7 +176,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
                 constant = 5
             client_name = f"client_{i}"
             avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, exp_CS_algo, 10, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
 
     if exp_type == "homo_low_dev":
         homo(1)
@@ -190,7 +194,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
         raise KeyError(f"Invalid experiment type {exp_type}")
     
     # create the server
-    server = sv.Server(exp_CS_algo, learning_rate, no_of_clients=no_of_cln, threshold=threshold, logger=logger, dataset_type=exp_type)
+    server = sv.Server(exp_CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, logger=logger, dataset_type=exp_type)
 
     # add the clients to the server
     for client in clients:

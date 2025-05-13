@@ -16,7 +16,7 @@ async def request_updates(server):
     for client in client_list:
         client_to_score[client] = calc_m_score(client, stats, server.training_round)
     sorted_clients = sorted(client_to_score.keys(), key=lambda client: client_to_score[client], reverse=True)
-    selected_clients = sorted_clients[:min(server.no_of_clients, len(sorted_clients))]
+    selected_clients = sorted_clients[:min(server.no_of_picked_clients, len(sorted_clients))]
     
     # request updates from clients
     for client in selected_clients:

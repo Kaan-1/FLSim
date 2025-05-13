@@ -8,7 +8,7 @@ async def request_updates(server):
     # Create tasks for all clients
     tasks = []
     client_list = list(server.client_scores.keys())
-    random_clients = random.sample(client_list, server.no_of_clients)
+    random_clients = random.sample(client_list, server.no_of_picked_clients)
     
     for client in random_clients:
         # Assuming client.get_updates() is an async method that needs current model parameters
