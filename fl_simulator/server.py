@@ -59,7 +59,7 @@ class Server:
 
             self.update_client_scores(client_updates)
 
-            client_updates = await self.request_updates()
+            client_updates = await self.request_updates(client_updates)
 
             self.aggregate_updates(client_updates)
 
@@ -82,7 +82,7 @@ class Server:
 
     # sends current model parameters to clients, waits for their response
     # int s: no of clients to be picked
-    async def request_updates(self):
+    async def request_updates(self, prev_rounds_updates):
         client_updates = {}
         if self.CS_algo == "loss":
             client_updates = await CS_loss.request_updates(self)
@@ -93,7 +93,7 @@ class Server:
         elif self.CS_algo == "random":
             client_updates = await CS_random.request_updates(self)
         else:   # self.CS_algo == "multi"
-            client_updates = await CS_multi_criteria.request_updates(self)
+            client_updates = await CS_multi_criteria.request_updates(self, prev_rounds_updates)
         return client_updates
 
 
