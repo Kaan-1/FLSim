@@ -185,3 +185,4 @@ logger/results/
 
 # plotter
 plot/output/
+plot/dataset_visualizations/
