@@ -51,7 +51,7 @@ def generate_linear_plot(real_slope, real_constant, starting_x, ending_x, error_
     # Customize the plot
     plt.xlabel('X', fontsize=12)
     plt.ylabel('Y', fontsize=12)
-    plt.title('Linear Regression Data with Real Line and Noisy Groups', fontsize=14)
+    plt.title(file_name, fontsize=14)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
