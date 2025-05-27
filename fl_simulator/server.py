@@ -24,7 +24,7 @@ class Server:
     # float constant: constant of the aggreagated line model (b of ax+b)
     # Dict(Client->int) clients: a dictionary of clients together with their weights
     # int no_of_clients: number of clients to be picked in each iteration 
-    def __init__(self, CS_algo: str, learning_rate: float, no_of_picked_clients=None, threshold=None, logger=None, dataset_type=None):
+    def __init__(self, CS_algo: str, learning_rate: float, no_of_picked_clients=None, threshold=None, logger=None, dataset_type=None, m_score_weights = None):
         self.CS_algo = CS_algo
         self.learning_rate = learning_rate
         self.no_of_picked_clients = no_of_picked_clients
@@ -32,6 +32,7 @@ class Server:
         self.client_scores = {}
         self.logger = logger
         self.dataset_type = dataset_type
+        self.m_score_weights = m_score_weights
         self.training_round = 0
 
     def init_model_weights(self):
@@ -59,7 +60,7 @@ class Server:
 
             self.update_client_scores(client_updates)
 
-            client_updates = await self.request_updates(client_updates)
+            client_updates = await self.request_updates(client_updates, self.m_score_weights)
 
             self.aggregate_updates(client_updates)
 
@@ -82,7 +83,7 @@ class Server:
 
     # sends current model parameters to clients, waits for their response
     # int s: no of clients to be picked
-    async def request_updates(self, prev_rounds_updates):
+    async def request_updates(self, prev_rounds_updates, m_score_weights):
         client_updates = {}
         if self.CS_algo == "loss":
             client_updates = await CS_loss.request_updates(self)
@@ -93,7 +94,7 @@ class Server:
         elif self.CS_algo == "random":
             client_updates = await CS_random.request_updates(self)
         else:   # self.CS_algo == "multi"
-            client_updates = await CS_multi_criteria.request_updates(self, prev_rounds_updates)
+            client_updates = await CS_multi_criteria.request_updates(self, prev_rounds_updates, m_score_weights)
         return client_updates
 
 

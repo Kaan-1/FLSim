@@ -103,6 +103,23 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
 
 
 
+    # weights of criterias for multi-criteria based CS
+    download_time_weight = 1
+    computation_time_weight = 1
+    upload_time_weight = 1
+    data_size_weight = 1
+    sample_freshness_weight = 1
+    loss_magnitude_weight = 10
+    m_score_weights = {
+        'download_time': download_time_weight,
+        'computation_time': computation_time_weight,
+        'upload_time': upload_time_weight,
+        'data_size': data_size_weight,
+        'sample_freshness': sample_freshness_weight,
+        'loss_magnitude': loss_magnitude_weight
+    }
+
+
     #######################################################################
     ####################### VARIABLE SPOT END #############################
     #######################################################################
@@ -194,7 +211,8 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
         raise KeyError(f"Invalid experiment type {exp_type}")
     
     # create the server
-    server = sv.Server(exp_CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, logger=logger, dataset_type=exp_type)
+    server = sv.Server(exp_CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, 
+                        logger=logger, dataset_type=exp_type, m_score_weights = m_score_weights)
 
     # add the clients to the server
     for client in clients:
