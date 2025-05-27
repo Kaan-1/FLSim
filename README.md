@@ -26,22 +26,22 @@ To run an experiment, run the run_all_exp.py file located in the managers/ direc
 There are several pretuned experiment datasets for a user to utilize. The datasets are still generated during runtime, but these options effect the parameters of the dataset being generated. Types of datasets, with their explanations, and instructions on how to run an experiment is given below.
 
 - **homo_low_dev**: Syntetic datasets of the clients all follow the same normal distribution, and they all have low individual deviation
-<center><img src="plot/dataset_visualizations/homo_low_dev.png" height="300"></center>
+<p align="center"><img src="plot/dataset_visualizations/homo_low_dev.png" height="300"></p>
 
 - **homo_high_dev**: Syntetic datasets of the clients all follow the same normal distribution, but with deviation high individual deviation
-<center><img src="plot/dataset_visualizations/homo_high_dev.png" height="300"></center>
+<p align="center"><img src="plot/dataset_visualizations/homo_high_dev.png" height="300"></p>
 
 - **semi_homo_low_dev**: Syntetic datasets of clients follow different normal distributions. In particular, some have positively skewed data, and some have negatively skewed data, and some are between. But they all follow low individual deviations, and they average to the true line.
-<center><img src="plot/dataset_visualizations/semi_homo_low_dev.png" height="300"></center>
+<p align="center"><img src="plot/dataset_visualizations/semi_homo_low_dev.png" height="300"></p>
 
 - **semi_homo_high_dev**: Syntetic datasets of clients follow different normal distributions. In particular, some have positively skewed data, and some have negatively skewed data, and some are between. They all follow high individual deviations, but they average to the true line.
-<center><img src="plot/dataset_visualizations/semi_homo_high_dev.png" height="300"></center>
+<p align="center"><img src="plot/dataset_visualizations/semi_homo_high_dev.png" height="300"></p>
 
 - **hetero_low_dev**: Syntetic datasets of clients follow different normal distributions. In particular, some are positively skewed, and some are on the true line. But they follow low individual deviations.
-<center><img src="plot/dataset_visualizations/hetero_low_dev.png" height="300"></center>
+<p align="center"><img src="plot/dataset_visualizations/hetero_low_dev.png" height="300"></p>
 
 - **hetero_low_dev**: Syntetic datasets of clients follow different normal distributions. In particular, some are positively skewed, and some are on the true line. They follow high individual deviations.
-<center><img src="plot/dataset_visualizations/hetero_high_dev.png" height="300"></center>
+<p align="center"><img src="plot/dataset_visualizations/hetero_high_dev.png" height="300"></p>
 
 
 **WARNING**: Picking high resp_var and non-homo experiment_type may result in inconsistent experiment result, as clients are attended response times randomly.
