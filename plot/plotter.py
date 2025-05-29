@@ -37,7 +37,8 @@ def plot_graphs():
         "reputation": "green",
         "multi": "purple",
         "random": "orange",
-        "all":"pink"
+        "all":"pink",
+        "reputation_update": "lightgreen"
     }
     
     grouped_results= defaultdict(list)
@@ -90,7 +91,7 @@ def plot_graphs():
         plt.close()
 
     # go through a subset of dict list, get the time bar graph
-    x_vals = ["loss", "threshold", "reputation", "multi", "random", "all"]
+    x_vals = ["loss", "threshold", "reputation", "multi", "random", "all", "reputation_update"]
     y_vals = []
 
     for x_val in x_vals:

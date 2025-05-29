@@ -17,6 +17,7 @@ from .client_selection_algorithms.reputation_based import reputation_based_clien
 from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_client as CS_multi_criteria
 from .client_selection_algorithms.random_based import random_based_client as CS_random
 from .client_selection_algorithms.all_based import all_based_client as CS_all
+from .client_selection_algorithms.reputation_update_based import reputation_update_based_client as CS_reputation_update
 
 class Client:
 
@@ -84,6 +85,8 @@ class Client:
             updates = CS_random.get_updates(self, global_model_slope, global_model_constant)
         elif self.CS_algo == "all":
             updates = CS_all.get_updates(self, global_model_slope, global_model_constant)
+        elif self.CS_algo == "reputation_update":
+            updates = CS_reputation_update.get_updates(self, global_model_slope, global_model_constant)
         else:   # self.CS_algo == "multi"
             updates = CS_multi_criteria.get_updates(self, global_model_slope, global_model_constant)
 
