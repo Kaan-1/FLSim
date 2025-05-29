@@ -14,6 +14,8 @@ This simulation tries to derive a 2D line using federated learning on 15 clients
 
 - **Reputation based client selection**: Picks clients based on their historical response times
 
+- **Reputation-update based client selection**: Picks clients whose local updates are close to other clients
+
 - **Multi-criteria based client selection**: Selects clients using a combination of factors such as:
     - Response time
     - Dataset size
