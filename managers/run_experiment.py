@@ -141,7 +141,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
         logger.add_entry_to_dict("response_time_threshold", threshold, ["params"])
         logger.add_entry_to_dict("total_number_of_clients", total_number_of_clients, ["params"])
     
-        print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "is starting")
+        print(f"[{exp_type}+{exp_CS_algo}]" .ljust(40), "is starting")
     
         # randomly generate data for clients, and then create the clients
         clients = []
@@ -227,7 +227,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
         logger.save_logs(f"{exp_CS_algo}_{exp_type}_run{run+1}")
     
         # print that the experiment is finished
-        print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "finished")
+        print(f"[{exp_type}+{exp_CS_algo}]" .ljust(40), "finished")
 
 
 if __name__ == "__main__":
