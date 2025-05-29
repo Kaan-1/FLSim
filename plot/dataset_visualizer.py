@@ -46,7 +46,7 @@ def generate_linear_plot(real_slope, real_constant, starting_x, ending_x, error_
         
         # Plot the points for this group
         plt.scatter(x_points, y_points, color=colors[i], alpha=0.7, 
-                   s=30, label=f'Group {i+1}', zorder=5)
+                   s=100, label=f'Group {i+1}', zorder=5)
     
     # Customize the plot
     plt.xlabel('X', fontsize=12)
