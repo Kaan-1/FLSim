@@ -73,11 +73,11 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
 
 
     # initial dataset size of clients
-    cln_init_dataset_size = 100
+    cln_init_dataset_size = 30
 
 
     # average number of entries to be deleted/added per round for clients
-    avg_data_update = 10
+    avg_data_update = 3
 
 
     # Learning rate of the ML algorithm
@@ -123,7 +123,6 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
     #######################################################################
     ####################### VARIABLE SPOT END #############################
     #######################################################################
-    aggregated_results = []
     for run in range(repeat):
         logger = lg.Logger()
     
@@ -165,7 +164,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
                 
                 if ratio<0.2:             # positively skewed clients
                     slope = 2
-                    constant = 6
+                    constant = 7
                 elif 0.2 <= ratio < 0.4:    # high slope clients
                     slope = 3
                     constant = 5
@@ -174,7 +173,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
                     constant = 5
                 elif 0.6 <= ratio < 0.8:   # negatively skewed clients
                     slope = 2
-                    constant = 4
+                    constant = 3
                 else:               # low slope clients
                     slope = 1
                     constant = 5
@@ -201,17 +200,17 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
                 clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
     
         if exp_type == "homo_low_dev":
-            homo(1)
+            homo(0.2)
         elif exp_type == "homo_high_dev":
-            homo(5)
+            homo(1)
         elif exp_type == "semi_homo_low_dev":
-            semi_homo(1)
+            semi_homo(0.2)
         elif exp_type == "semi_homo_high_dev":
-            semi_homo(5)
+            semi_homo(1)
         elif exp_type == "hetero_low_dev":
-            hetero(1)
+            hetero(0.2)
         elif exp_type == "hetero_high_dev":
-            hetero(5)
+            hetero(1)
         else:
             raise KeyError(f"Invalid experiment type {exp_type}")
         
@@ -229,9 +228,6 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
     
         # print that the experiment is finished
         print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "finished")
-        
-    ##JSON result as dict
-    aggregated_results.append(logger.get_dict())
 
 
 if __name__ == "__main__":

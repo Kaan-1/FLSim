@@ -14,7 +14,7 @@ async def run_all_exp():
     exp_CS_algos = ["loss", "threshold", "reputation", "multi", "random","all"]
 
     tasks = [
-        run_experiment.run_exp(experiment_type=dt, experiment_CS_algo=algo, total_number_of_clients=15, repeat=10)
+        run_experiment.run_exp(experiment_type=dt, experiment_CS_algo=algo, total_number_of_clients=20, repeat=5)
             for dt in exp_data_types
             for algo in exp_CS_algos
     ]

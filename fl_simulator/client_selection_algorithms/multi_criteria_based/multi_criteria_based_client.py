@@ -29,11 +29,11 @@ def get_updates(client, global_model_slope, global_model_constant):
     slope_update = client_slope - global_model_slope
     constant_update = client_constant - global_model_constant
 
-    # Calculate predictions using the client's model
-    y_pred = client_slope * x + client_constant
+    # Calculate predictions using the global model
+    y_pred_global = global_model_slope * x + global_model_constant
     
     # Calculate Mean Squared Residual Error (MSRE)
-    loss_value = np.mean((y - y_pred) ** 2)
+    loss_value = np.mean((y - y_pred_global) ** 2)
 
     # outlier detection
     if abs(slope_update) > 10:
