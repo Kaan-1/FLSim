@@ -3,6 +3,8 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+from collections import defaultdict
+
 def plot_graphs():
 
     exp_data_types = ["homo_low_dev", "homo_high_dev",
@@ -37,15 +39,48 @@ def plot_graphs():
         "random": "orange",
         "all":"pink"
     }
-
+    
+    grouped_results= defaultdict(list)
+    for result in dict_list:
+        key = (result["params"]["dataset_type"], result["params"]["cs_algo"])
+        grouped_results[key].append(result)
+        
+#DEBUG    
+#    for key, results in grouped_results.items():
+#        print(f"Config {key} has {len(results)} result(s)")
+    
     # go through the dict list, get the MSRE plots
     for data_type in exp_data_types:
-        x_vals = get_x_vals(dict_list[0])
-        for result_dict in dict_list:
-            if result_dict["params"]["dataset_type"] == data_type:
+        for algo in cs_algo_colors:
+            key = (data_type, algo)
+            if key not in grouped_results:
+                continue
+            
+            all_y_vals = []
+            x_vals = None           
+            
+            for result_dict in grouped_results[key]:
                 y_vals = get_y_vals(result_dict, validation_dataset)
-                algo = result_dict["params"]["cs_algo"]
-                plt.plot(x_vals, y_vals, label=algo, color=cs_algo_colors[algo])
+                
+                #DEBUG
+#                print(f"MRSE for {key} in one run: {y_vals[:5]}...")
+                
+                if x_vals is None:
+                    x_vals = get_x_vals(result_dict)
+                all_y_vals.append(np.array(y_vals))
+
+            if all_y_vals:
+                #DEBUG
+#                for y_vals in all_y_vals:
+#                    print(f"MRSE length: {len(y_vals)}")
+
+                avg_y_vals = np.mean(np.stack(all_y_vals), axis=0)
+                
+                #DEBUG
+#                print(f"Average MRSE for {key}: {avg_y_vals[:5]}...")  # first 5 rounds
+                plt.plot(x_vals, avg_y_vals, label=algo, color=cs_algo_colors[algo])
+                
+            
         plt.title(f"Error rates on {data_type}")
         plt.xlabel("Rounds")
         plt.ylabel("MRSE")
@@ -55,14 +90,18 @@ def plot_graphs():
         plt.close()
 
     # go through a subset of dict list, get the time bar graph
-    x_vals = ["loss", "threshold", "reputation", "multi", "random","all"]
+    x_vals = ["loss", "threshold", "reputation", "multi", "random", "all"]
     y_vals = []
+
     for x_val in x_vals:
-        for result_dict in dict_list:
-            if result_dict["params"]["cs_algo"] == x_val and \
-                    result_dict["params"]["dataset_type"] == "homo_low_dev":
-                time = calculate_total_time(result_dict, x_val)
-                y_vals.append(time)
+        key=("homo_low_dev", x_val)
+        if key in grouped_results:
+            total_times=[calculate_total_time(r, x_val) for r in grouped_results[key]]
+            #DEBUG
+#            print(f"Total times for {key}: {total_times}")
+            y_vals.append(np.mean(total_times))
+        else:
+            y_vals.append(0)
     colors = [cs_algo_colors[algo] for algo in x_vals]
     plt.bar(x_vals, y_vals, color=colors)
     plt.title("Total time of training")

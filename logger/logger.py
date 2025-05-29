@@ -25,3 +25,6 @@ class Logger:
             return result
         except Exception:
             raise KeyError(f"couldn't find the nested object located at: {path}")
+            
+    def get_dict(self):
+        return self.logs

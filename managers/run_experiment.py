@@ -20,7 +20,7 @@ import fl_simulator.client as cl
 import asyncio
 import logger.logger as lg
 
-async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of_clients=None):
+async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of_clients=None, repeat=10):
 
     #######################################################################
     ####################### VARIABLE SPOT START ###########################
@@ -123,113 +123,115 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None, total_number_of
     #######################################################################
     ####################### VARIABLE SPOT END #############################
     #######################################################################
-
-    logger = lg.Logger()
-
-    # log the picked variables
-    logger.add_entry_to_dict("params", {})
-    logger.add_entry_to_dict("dataset_type", exp_type, ["params"])
-    logger.add_entry_to_dict("cs_algo", exp_CS_algo, ["params"])
-    logger.add_entry_to_dict("response_variance", resp_var, ["params"])
-    logger.add_entry_to_dict("avg_download_time", avg_download_time, ["params"])
-    logger.add_entry_to_dict("avg_computation_time", avg_computation_time, ["params"])
-    logger.add_entry_to_dict("avg_upload_time", avg_upload_time, ["params"])
-    logger.add_entry_to_dict("avg_client_data_update_per_round", avg_data_update, ["params"])
-    logger.add_entry_to_dict("learning_rate", learning_rate, ["params"])
-    logger.add_entry_to_dict("no_of_rounds", no_of_rounds, ["params"])
-    logger.add_entry_to_dict("no_of_picked_clients_per_round", no_of_picked_cln, ["params"])
-    logger.add_entry_to_dict("response_time_threshold", threshold, ["params"])
-    logger.add_entry_to_dict("total_number_of_clients", total_number_of_clients, ["params"])
-
-    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "is starting")
-
-    # randomly generate data for clients, and then create the clients
-    clients = []
-
-    # will be used to generate the response times of the clients
-    avg_resp_vals = (resp_var, avg_download_time, avg_computation_time, avg_upload_time)
-
-
-    def homo(dev):
-        avg_dataset_vals = (avg_data_update, 2, 5, 0, 10, dev)
-        for i in range(total_number_of_clients):
-            client_name = f"client_{i}"
-            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
-            
-    def semi_homo(dev):
-        for i in range(total_number_of_clients):
-            ratio = i / total_number_of_clients
-            slope = None
-            constant = None
-            
-            if ratio<0.2:             # positively skewed clients
-                slope = 2
-                constant = 6
-            elif 0.2 <= ratio < 0.4:    # high slope clients
-                slope = 3
-                constant = 5
-            elif 0.4 <= ratio < 0.6:    # normal clients
-                slope = 2
-                constant = 5
-            elif 0.6 <= ratio < 0.8:   # negatively skewed clients
-                slope = 2
-                constant = 4
-            else:               # low slope clients
-                slope = 1
-                constant = 5
-            client_name = f"client_{i}"
-            avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+    aggregated_results = []
+    for run in range(repeat):
+        logger = lg.Logger()
     
-    def hetero(dev):
-        for i in range(total_number_of_clients):
-            ratio = i / total_number_of_clients
-            slope = None
-            constant = None
-            if ratio<(1/3):                 # positively skewed clients
-                slope = 2
-                constant = 7
-            elif (1/3) <= ratio < (2/3):       # high slope clients
-                slope = 4
-                constant = 5
-            else:                   # normal clients
-                slope = 2
-                constant = 5
-            client_name = f"client_{i}"
-            avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
-
-    if exp_type == "homo_low_dev":
-        homo(1)
-    elif exp_type == "homo_high_dev":
-        homo(5)
-    elif exp_type == "semi_homo_low_dev":
-        semi_homo(1)
-    elif exp_type == "semi_homo_high_dev":
-        semi_homo(5)
-    elif exp_type == "hetero_low_dev":
-        hetero(1)
-    elif exp_type == "hetero_high_dev":
-        hetero(5)
-    else:
-        raise KeyError(f"Invalid experiment type {exp_type}")
+        # log the picked variables
+        logger.add_entry_to_dict("params", {})
+        logger.add_entry_to_dict("dataset_type", exp_type, ["params"])
+        logger.add_entry_to_dict("cs_algo", exp_CS_algo, ["params"])
+        logger.add_entry_to_dict("response_variance", resp_var, ["params"])
+        logger.add_entry_to_dict("avg_download_time", avg_download_time, ["params"])
+        logger.add_entry_to_dict("avg_computation_time", avg_computation_time, ["params"])
+        logger.add_entry_to_dict("avg_upload_time", avg_upload_time, ["params"])
+        logger.add_entry_to_dict("avg_client_data_update_per_round", avg_data_update, ["params"])
+        logger.add_entry_to_dict("learning_rate", learning_rate, ["params"])
+        logger.add_entry_to_dict("no_of_rounds", no_of_rounds, ["params"])
+        logger.add_entry_to_dict("no_of_picked_clients_per_round", no_of_picked_cln, ["params"])
+        logger.add_entry_to_dict("response_time_threshold", threshold, ["params"])
+        logger.add_entry_to_dict("total_number_of_clients", total_number_of_clients, ["params"])
     
-    # create the server
-    server = sv.Server(exp_CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, 
-                        logger=logger, dataset_type=exp_type, m_score_weights = m_score_weights)
-
-    # add the clients to the server
-    for client in clients:
-        server.add_client(client, 10)
-
-    # train the model
-    await server.train_model(no_of_rounds)
-    logger.save_logs(f"{exp_CS_algo}_{exp_type}")
-
-    # print that the experiment is finished
-    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "finished")
-
-
+        print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "is starting")
+    
+        # randomly generate data for clients, and then create the clients
+        clients = []
+    
+        # will be used to generate the response times of the clients
+        avg_resp_vals = (resp_var, avg_download_time, avg_computation_time, avg_upload_time)
+    
+    
+        def homo(dev):
+            avg_dataset_vals = (avg_data_update, 2, 5, 0, 10, dev)
+            for i in range(total_number_of_clients):
+                client_name = f"client_{i}"
+                clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+                
+        def semi_homo(dev):
+            for i in range(total_number_of_clients):
+                ratio = i / total_number_of_clients
+                slope = None
+                constant = None
+                
+                if ratio<0.2:             # positively skewed clients
+                    slope = 2
+                    constant = 6
+                elif 0.2 <= ratio < 0.4:    # high slope clients
+                    slope = 3
+                    constant = 5
+                elif 0.4 <= ratio < 0.6:    # normal clients
+                    slope = 2
+                    constant = 5
+                elif 0.6 <= ratio < 0.8:   # negatively skewed clients
+                    slope = 2
+                    constant = 4
+                else:               # low slope clients
+                    slope = 1
+                    constant = 5
+                client_name = f"client_{i}"
+                avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
+                clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+        
+        def hetero(dev):
+            for i in range(total_number_of_clients):
+                ratio = i / total_number_of_clients
+                slope = None
+                constant = None
+                if ratio<(1/3):                 # positively skewed clients
+                    slope = 2
+                    constant = 7
+                elif (1/3) <= ratio < (2/3):       # high slope clients
+                    slope = 4
+                    constant = 5
+                else:                   # normal clients
+                    slope = 2
+                    constant = 5
+                client_name = f"client_{i}"
+                avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
+                clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+    
+        if exp_type == "homo_low_dev":
+            homo(1)
+        elif exp_type == "homo_high_dev":
+            homo(5)
+        elif exp_type == "semi_homo_low_dev":
+            semi_homo(1)
+        elif exp_type == "semi_homo_high_dev":
+            semi_homo(5)
+        elif exp_type == "hetero_low_dev":
+            hetero(1)
+        elif exp_type == "hetero_high_dev":
+            hetero(5)
+        else:
+            raise KeyError(f"Invalid experiment type {exp_type}")
+        
+        # create the server
+        server = sv.Server(exp_CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, 
+                            logger=logger, dataset_type=exp_type, m_score_weights = m_score_weights)
+    
+        # add the clients to the server
+        for client in clients:
+            server.add_client(client, 10)
+    
+        # train the model
+        await server.train_model(no_of_rounds)
+        logger.save_logs(f"{exp_CS_algo}_{exp_type}_run{run+1}")
+    
+        # print that the experiment is finished
+        print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "finished")
+        
+    ##JSON result as dict
+    aggregated_results.append(logger.get_dict())
 
 
 if __name__ == "__main__":
