@@ -59,9 +59,9 @@ def update_client_scores(server, client_updates):
             sign = math.copysign(1, diff)
             if 0 <= abs_diff < (max_resp_dev/3):
                 server.client_scores[client] += 1 * sign
-            elif (max_resp_dev/3) <= diff < ((2*max_resp_dev)/3):
+            elif (max_resp_dev/3) <= abs_diff < ((2*max_resp_dev)/3):
                 server.client_scores[client] += 2 * sign
-            else:       # ((2*max_resp_dev)/3) <= diff <= max_resp_dev
+            else:       # ((2*max_resp_dev)/3) <= abs_diff <= max_resp_dev
                 server.client_scores[client] += 3 * sign
 
             # TO DO: calculate the average of the model updates

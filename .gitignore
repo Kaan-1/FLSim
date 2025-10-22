@@ -178,3 +178,10 @@ deneme.py
 
 # experiment trace
 experiment_trace.txt
+experiment_trace.json
+
+# logger results
+logger/results/
+
+# plotter
+plot/output/

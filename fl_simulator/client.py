@@ -11,11 +11,11 @@
 
 import asyncio
 import numpy as np
-import random
 from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
 from .client_selection_algorithms.threshold_based import threshold_based_client as CS_threshold
 from .client_selection_algorithms.reputation_based import reputation_based_client as CS_reputation
 from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_client as CS_multi_criteria
+from .client_selection_algorithms.random_based import random_based_client as CS_random
 
 class Client:
 
@@ -48,10 +48,10 @@ class Client:
         self.avg_data_vals = avg_data_vals
 
         # intialize the dataset
-        self.add_to_dataset(init_dataset_size)
+        self.add_to_dataset(init_dataset_size, 0)
 
         # initialize the fields of the client
-        self.update_atts(False)
+        self.update_atts(0, False)
 
 
     # for debugging purposes
@@ -79,6 +79,8 @@ class Client:
             updates = CS_threshold.get_updates(self, global_model_slope, global_model_constant, threshold)
         elif self.CS_algo == "reputation":
             updates = CS_reputation.get_updates(self, global_model_slope, global_model_constant)
+        elif self.CS_algo == "random":
+            updates = CS_random.get_updates(self, global_model_slope, global_model_constant)
         else:   # self.CS_algo == "multi"
             updates = CS_multi_criteria.get_updates(self, global_model_slope, global_model_constant)
 
@@ -89,7 +91,7 @@ class Client:
 
 
     # updates download_time, upload_time, computation_time and dataset of clients
-    def update_atts(self, change_dataset = True):
+    def update_atts(self, training_round, change_dataset = True):
         self.download_time = abs(np.random.normal(loc=self.avg_resp_vals[1], 
                                                         scale=self.avg_resp_vals[0]))
         self.computation_time = abs(np.random.normal(loc=self.avg_resp_vals[2], 
@@ -99,27 +101,27 @@ class Client:
         if change_dataset:
             no_of_entry_changes = int(round(np.random.normal(loc=0, scale=self.avg_data_vals[0])))
             if no_of_entry_changes > 0:
-                self.add_to_dataset(no_of_entry_changes)
+                self.add_to_dataset(no_of_entry_changes, training_round)
             elif no_of_entry_changes < 0:
                 if abs(no_of_entry_changes) < len(self.dataset):     # don't compeletely wipe out the dataset
                     self.remove_from_dataset(abs(no_of_entry_changes))
 
 
-    def add_to_dataset(self, num_of_points):
-        interval_len = self.avg_data_vals[4] - self.avg_data_vals[3]
-        step_size = interval_len / num_of_points
-        step = 0
-        for i in range(num_of_points):
-            step += step_size
-            y_val = (self.avg_data_vals[1] * step) + self.avg_data_vals[2]
+    # we add the training round as a time stamp to the samples added to the datasets
+    # this way, we can measure the sample freshness of clients
+    def add_to_dataset(self, num_of_points, training_round):
+        x_vals = np.random.uniform(self.avg_data_vals[3], self.avg_data_vals[4], num_of_points)
+        for x_val in x_vals:
+            y_val = (self.avg_data_vals[1] * x_val) + self.avg_data_vals[2]
             error = np.random.normal(loc=0, scale = self.avg_data_vals[5])
-            self.dataset.append([step, y_val+error])
+            self.dataset.append([x_val, y_val+error, training_round])
 
 
+    # removes no_of_ent_to_remove oldest elements from the dataset
     def remove_from_dataset(self, no_of_ent_to_remove):
-        indices_to_remove = random.sample(range(len(self.dataset)), no_of_ent_to_remove)
-        for i in sorted(indices_to_remove, reverse=True):
-            self.dataset.pop(i)
+        self.dataset.sort(key=lambda x: x[2])
+        for i in range(no_of_ent_to_remove):
+            self.dataset.pop(0)
 
 
     # gets a tuple of size 4
