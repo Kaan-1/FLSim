@@ -140,7 +140,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     logger.add_entry_to_dict("no_of_picked_clients_per_round", no_of_picked_cln, ["params"])
     logger.add_entry_to_dict("response_time_threshold", threshold, ["params"])
 
-    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "is starting")
+    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(40), "is starting")
 
     # randomly generate data for clients, and then create the clients
     clients = []
@@ -161,7 +161,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
             constant = None
             if i<3:             # positively skewed clients
                 slope = 2
-                constant = 6
+                constant = 7
             elif 3 <= i < 6:    # high slope clients
                 slope = 3
                 constant = 5
@@ -170,7 +170,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
                 constant = 5
             elif 9 <= i < 12:   # negatively skewed clients
                 slope = 2
-                constant = 4
+                constant = 3
             else:               # low slope clients
                 slope = 1
                 constant = 5
@@ -196,17 +196,17 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
             clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
 
     if exp_type == "homo_low_dev":
-        homo(1)
+        homo(0.2)
     elif exp_type == "homo_high_dev":
-        homo(5)
+        homo(1)
     elif exp_type == "semi_homo_low_dev":
-        semi_homo(1)
+        semi_homo(0.2)
     elif exp_type == "semi_homo_high_dev":
-        semi_homo(5)
+        semi_homo(1)
     elif exp_type == "hetero_low_dev":
-        hetero(1)
+        hetero(0.2)
     elif exp_type == "hetero_high_dev":
-        hetero(5)
+        hetero(1)
     else:
         raise KeyError(f"Invalid experiment type {exp_type}")
     
@@ -223,7 +223,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     logger.save_logs(f"{exp_CS_algo}_{exp_type}")
 
     # print that the experiment is finished
-    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(32), "finished")
+    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(40), "finished")
 
 
 

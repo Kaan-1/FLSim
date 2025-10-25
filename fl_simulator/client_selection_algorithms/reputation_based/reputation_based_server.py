@@ -50,7 +50,7 @@ def update_client_scores(server, client_updates):
 
         # if the client falls below the threshold, i.e not being picked, increment it's score
         if score < 7:
-            server.client_scores[client] += 1
+            server.client_scores[client] += 0.5
         elif 7 <= score < 25:
             
             # penalize or reward clients based on avg and max_resp_dev

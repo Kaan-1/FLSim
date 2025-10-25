@@ -46,7 +46,7 @@ def generate_linear_plot(real_slope, real_constant, starting_x, ending_x, error_
         
         # Plot the points for this group
         plt.scatter(x_points, y_points, color=colors[i], alpha=0.7, 
-                   s=30, label=f'Group {i+1}', zorder=5)
+                   s=100, label=f'Group {i+1}', zorder=5)
     
     # Customize the plot
     plt.xlabel('X', fontsize=12)
@@ -71,30 +71,30 @@ if __name__ == "__main__":
     
     # homo_low_dev
     generate_linear_plot(real_slope, real_constant, starting_x, ending_x, 
-                        1, [2.0], [5.0], [150],
+                        0.2, [2.0], [5.0], [150],
                         "homo_low_dev")
     
     # homo_high_dev
     generate_linear_plot(real_slope, real_constant, starting_x, ending_x, 
-                        5, [2.0], [5.0], [150],
+                        1, [2.0], [5.0], [150],
                         "homo_high_dev")
     
     # semi_homo_low_dev
     generate_linear_plot(real_slope, real_constant, starting_x, ending_x, 
-                        1, [2.0, 2.0, 3.0, 2.0, 1.0], [5.0, 6.0, 5.0, 4.0, 5.0], [30, 30, 30, 30, 30],
+                        0.2, [2.0, 2.0, 3.0, 2.0, 1.0], [5.0, 7.0, 5.0, 3.0, 5.0], [30, 30, 30, 30, 30],
                         "semi_homo_low_dev")
     
     # semi_homo_high_dev
     generate_linear_plot(real_slope, real_constant, starting_x, ending_x, 
-                        5, [2.0, 2.0, 3.0, 2.0, 1.0], [5.0, 6.0, 5.0, 4.0, 5.0], [30, 30, 30, 30, 30],
+                        1, [2.0, 2.0, 3.0, 2.0, 1.0], [5.0, 7.0, 5.0, 3.0, 5.0], [30, 30, 30, 30, 30],
                         "semi_homo_high_dev")
     
     # hetero_low_dev
     generate_linear_plot(real_slope, real_constant, starting_x, ending_x, 
-                        1, [2.0, 2.0, 4.0], [5.0, 7.0, 5.0], [50, 50, 50],
+                        0.2, [2.0, 2.0, 4.0], [5.0, 7.0, 5.0], [50, 50, 50],
                         "hetero_low_dev")
     
     # hetero_high_dev
     generate_linear_plot(real_slope, real_constant, starting_x, ending_x, 
-                        5, [2.0, 2.0, 4.0], [5.0, 7.0, 5.0], [50, 50, 50],
+                        1, [2.0, 2.0, 4.0], [5.0, 7.0, 5.0], [50, 50, 50],
                         "hetero_high_dev")

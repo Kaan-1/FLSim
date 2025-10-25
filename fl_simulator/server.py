@@ -17,6 +17,8 @@ from .client_selection_algorithms.threshold_based import threshold_based_server 
 from .client_selection_algorithms.reputation_based import reputation_based_server as CS_reputation
 from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_server as CS_multi_criteria
 from .client_selection_algorithms.random_based import random_based_server as CS_random
+from .client_selection_algorithms.all_based import all_based_server as CS_all
+from .client_selection_algorithms.reputation_update_based import reputation_update_based_server as CS_reputation_update
 
 class Server:
 
@@ -50,7 +52,7 @@ class Server:
         self.log_state("init")
 
         for i in range(no_of_rounds):
-            print(f"[{self.dataset_type}+{self.CS_algo}]" .ljust(32), f"is on round {i+1}")
+            print(f"[{self.dataset_type}+{self.CS_algo}]" .ljust(40), f"is on round {i+1}")
             self.training_round = i+1
 
             # tells the clients to update their attributes at the start of each round
@@ -93,6 +95,10 @@ class Server:
             client_updates = await CS_reputation.request_updates(self)
         elif self.CS_algo == "random":
             client_updates = await CS_random.request_updates(self)
+        elif self.CS_algo == "all":
+            client_updates = await CS_all.request_updates(self)
+        elif self.CS_algo == "reputation_update":
+            client_updates = await CS_reputation_update.request_updates(self)
         else:   # self.CS_algo == "multi"
             client_updates = await CS_multi_criteria.request_updates(self, prev_rounds_updates, m_score_weights)
         return client_updates
@@ -109,6 +115,10 @@ class Server:
             CS_reputation.update_client_scores(self, client_updates)
         elif self.CS_algo == "random":
             CS_random.update_client_scores(self, client_updates)
+        elif self.CS_algo == "all":
+            CS_all.update_client_scores(self, client_updates)
+        elif self.CS_algo == "reputation_update":
+            CS_reputation_update.update_client_scores(self, client_updates)
         else:   # self.CS_algo == "multi"
             CS_multi_criteria.update_client_scores(self,client_updates)
 
