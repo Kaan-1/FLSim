@@ -6,9 +6,9 @@
 seed = 6
 
 import random
-import numpy
+import numpy as np
 random.seed(seed)
-numpy.random.seed(seed)
+np.random.seed(seed)
 
 # to be able to get to fl_simulator and logger folders
 import sys
@@ -19,97 +19,112 @@ import fl_simulator.server as sv
 import fl_simulator.client as cl
 import asyncio
 import logger.logger as lg
-
-async def run_exp(experiment_type=None, experiment_CS_algo=None):
-
-    #######################################################################
-    ####################### VARIABLE SPOT START ###########################
-    #######################################################################
+from fl_simulator.common import CSAlgo
+from dataset_generator.common import DatasetType
 
 
-    # type of dataset to be used for clients
-    # detalied information about the datasets can be found in the readme
-    # possible values include: 
-        # homo_low_dev 
-        # homo_high_dev 
-        # semi_homo_low_dev
-        # semi_homo_high_dev 
-        # hetero_low_dev
-        # hetero_high_dev
-    exp_type = "homo_low_dev"
-    if experiment_type != None:
-        exp_type = experiment_type
+# EXPLANATION OF FUNCTION PARAMETERS
 
 
-    # type of CS algorithm to be tested in the simulation
-    # possible values include
-        # loss
-        # threshold
-        # reputation
-        # multi
-    exp_CS_algo = "threshold"
-    if experiment_CS_algo != None:
-        exp_CS_algo = experiment_CS_algo
+# dataset_type
+# type of dataset to be used for clients
+# detalied information about the datasets can be found in the readme
+# possible values include: 
+# homo_low_dev 
+# homo_high_dev 
+# semi_homo_low_dev
+# semi_homo_high_dev 
+# hetero_low_dev
+# hetero_high_dev
 
 
-    # variance of response times that the clients will have
-    # Recommended values
-        # low: 0.25
-        # mid: 1
-        # high: 5
-    resp_var = 0.01
+# CS_algo
+# type of CS algorithm to be tested in the simulation
+# possible values include
+# loss
+# threshold
+# reputation
+# multi
 
 
-    # average download time of clients
-    avg_download_time = 0.01
+# resp_var
+# variance of response times that the clients will have
+# Recommended values
+# low: 0.25
+# mid: 1
+# high: 5
 
 
-    # average computation time of clients
-    avg_computation_time = 0.04
+# avg_download_time
+# average download time of clients
 
 
-    # average upload time of clients
-    avg_upload_time = 0.02
+# avg_computation_time
+# average computation time of clients
 
 
-    # initial dataset size of clients
-    cln_init_dataset_size = 100
+# avg_upload_time
+# average upload time of clients
 
 
-    # average number of entries to be deleted/added per round for clients
-    avg_data_update = 10
+# cln_init_dataset_size
+# initial dataset size of clients
 
 
-    # Learning rate of the ML algorithm
-    learning_rate = 0.05
+# avg_data_update
+# average number of entries to be deleted/added per round for clients
 
 
-    # no of rounds to train the model
-    no_of_rounds = 100
+# learning_rate
+# Learning rate of the ML algorithm
 
 
-    # number of clients to be picked each round
-    # Redundant for some of the CS algorihms, such as threshold based CS
-    # Total number of clients is 15
-    no_of_picked_cln = 8
+# no_of_rounds
+# no of rounds to train the model
 
 
-    # Time limit that clients are allowed to compute their updates in
-    # Only used in threshold based client selection
-    # Have to make it None otherwise, because of the current implementation
-    threshold = 0.04
-    if exp_CS_algo != "threshold":
-        threshold = None
+# no_of_picked_cln
+# number of clients to be picked each round
+# Redundant for some of the CS algorihms, such as threshold based CS
+# Total number of clients is 15
 
 
+# threshold
+# Time limit that clients are allowed to compute their updates in
+# Only used in threshold based client selection
 
-    # weights of criterias for multi-criteria based CS
-    download_time_weight = 1
-    computation_time_weight = 1
-    upload_time_weight = 1
-    data_size_weight = 1
-    sample_freshness_weight = 1
-    loss_magnitude_weight = 10
+
+# download_time_weight = 1
+# computation_time_weight = 1
+# upload_time_weight = 1
+# data_size_weight = 1
+# sample_freshness_weight = 1
+# loss_magnitude_weight = 10
+# weights of criterias for multi-criteria based CS
+
+
+async def run_exp(
+        dataset_type = DatasetType.HETERO_LOW_DEV,
+        CS_algo = CSAlgo.REPUTATION_UPDATE,
+        rep = 0,
+        resp_var = 0.01,
+        avg_download_time = 0.01,
+        avg_computation_time = 0.04,
+        avg_upload_time = 0.02,
+        cln_init_dataset_size = 100,
+        avg_data_update = 10,
+        learning_rate = 0.1,
+        no_of_rounds = 50,
+        no_of_picked_cln = 8,
+        threshold = 0.04,
+        download_time_weight = 1,
+        computation_time_weight = 1,
+        upload_time_weight = 1,
+        data_size_weight = 1,
+        sample_freshness_weight = 1,
+        loss_magnitude_weight = 10
+        ):
+
     m_score_weights = {
         'download_time': download_time_weight,
         'computation_time': computation_time_weight,
@@ -119,17 +134,13 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
         'loss_magnitude': loss_magnitude_weight
     }
 
-
-    #######################################################################
-    ####################### VARIABLE SPOT END #############################
-    #######################################################################
-
     logger = lg.Logger()
 
     # log the picked variables
     logger.add_entry_to_dict("params", {})
-    logger.add_entry_to_dict("dataset_type", exp_type, ["params"])
-    logger.add_entry_to_dict("cs_algo", exp_CS_algo, ["params"])
+    logger.add_entry_to_dict("dataset_type", dataset_type.name, ["params"])
+    logger.add_entry_to_dict("cs_algo", CS_algo.name, ["params"])
+    logger.add_entry_to_dict("rep", rep, ["params"])
     logger.add_entry_to_dict("response_variance", resp_var, ["params"])
     logger.add_entry_to_dict("avg_download_time", avg_download_time, ["params"])
     logger.add_entry_to_dict("avg_computation_time", avg_computation_time, ["params"])
@@ -140,7 +151,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
     logger.add_entry_to_dict("no_of_picked_clients_per_round", no_of_picked_cln, ["params"])
     logger.add_entry_to_dict("response_time_threshold", threshold, ["params"])
 
-    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(40), "is starting")
+    print(f"[{dataset_type.name}+{CS_algo.name}]" .ljust(40), "is starting")
 
     # randomly generate data for clients, and then create the clients
     clients = []
@@ -153,7 +164,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
         avg_dataset_vals = (avg_data_update, 2, 5, 0, 10, dev)
         for i in range(15):
             client_name = f"client_{i}"
-            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl.Client(client_name, CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
             
     def semi_homo(dev):
         for i in range(15):
@@ -176,7 +187,7 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
                 constant = 5
             client_name = f"client_{i}"
             avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl.Client(client_name, CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
     
     def hetero(dev):
         for i in range(15):
@@ -193,26 +204,26 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
                 constant = 5
             client_name = f"client_{i}"
             avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, exp_CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl.Client(client_name, CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
 
-    if exp_type == "homo_low_dev":
+    if dataset_type == DatasetType.HOMO_LOW_DEV:
         homo(0.2)
-    elif exp_type == "homo_high_dev":
+    elif dataset_type == DatasetType.HOMO_HIGH_DEV:
         homo(1)
-    elif exp_type == "semi_homo_low_dev":
+    elif dataset_type == DatasetType.SEMI_HOMO_LOW_DEV:
         semi_homo(0.2)
-    elif exp_type == "semi_homo_high_dev":
+    elif dataset_type == DatasetType.SEMI_HOMO_HIGH_DEV:
         semi_homo(1)
-    elif exp_type == "hetero_low_dev":
+    elif dataset_type == DatasetType.HETERO_LOW_DEV:
         hetero(0.2)
-    elif exp_type == "hetero_high_dev":
+    elif dataset_type == DatasetType.HETERO_HIGH_DEV:
         hetero(1)
     else:
-        raise KeyError(f"Invalid experiment type {exp_type}")
+        raise KeyError(f"Invalid experiment type {dataset_type.name}")
     
     # create the server
-    server = sv.Server(exp_CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, 
-                        logger=logger, dataset_type=exp_type, m_score_weights = m_score_weights)
+    server = sv.Server(CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, 
+                        logger=logger, dataset_type=dataset_type, m_score_weights = m_score_weights)
 
     # add the clients to the server
     for client in clients:
@@ -220,10 +231,10 @@ async def run_exp(experiment_type=None, experiment_CS_algo=None):
 
     # train the model
     await server.train_model(no_of_rounds)
-    logger.save_logs(f"{exp_CS_algo}_{exp_type}")
+    logger.save_logs(f"{CS_algo.name}_{dataset_type.name}_rep_{rep}")
 
     # print that the experiment is finished
-    print(f"[{exp_type}+{exp_CS_algo}]" .ljust(40), "finished")
+    print(f"[{dataset_type.name}+{CS_algo.name}]" .ljust(40), "finished")
 
 
 

@@ -2,12 +2,12 @@ import os
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from fl_simulator.common import CSAlgo
+from dataset_generator.common import DatasetType
 
 def plot_graphs():
 
-    exp_data_types = ["homo_low_dev", "homo_high_dev",
-                        "semi_homo_low_dev", "semi_homo_high_dev",
-                        "hetero_low_dev", "hetero_high_dev"]
+    exp_data_types = list(DatasetType)
 
     validation_dataset = create_val_dataset()
 
@@ -30,42 +30,55 @@ def plot_graphs():
 
     # define the colors of cs algorithms
     cs_algo_colors = {
-        "loss": "blue",
-        "threshold": "red",
-        "reputation": "green",
-        "multi": "purple",
-        "random": "orange",
-        "all":"pink",
-        "reputation_update": "lightgreen"
+        CSAlgo.LOSS.name: "blue",
+        CSAlgo.THRESHOLD.name: "red",
+        CSAlgo.REPUTATION.name: "green",
+        CSAlgo.MULTI.name: "purple",
+        CSAlgo.RANDOM.name: "orange",
+        CSAlgo.ALL.name: "pink",
+        CSAlgo.REPUTATION_UPDATE.name: "lightgreen"
     }
 
     # go through the dict list, get the MSRE plots
     for data_type in exp_data_types:
         x_vals = get_x_vals(dict_list[0])
+        results_by_algo_lst = {}
+        for algo in list(CSAlgo):
+            results_by_algo_lst[algo.name] = {}
         for result_dict in dict_list:
-            if result_dict["params"]["dataset_type"] == data_type:
+            if result_dict["params"]["dataset_type"] == data_type.name:
                 y_vals = get_y_vals(result_dict, validation_dataset)
                 algo = result_dict["params"]["cs_algo"]
-                plt.plot(x_vals, y_vals, label=algo, color=cs_algo_colors[algo])
-        plt.title(f"Error rates on {data_type}")
+                rep = result_dict["params"]["rep"]
+                results_by_algo_lst[algo][rep] = y_vals
+        for algo, rep_dict in results_by_algo_lst.items():
+            y_val_sum = np.zeros(len(rep_dict[0]))
+            for rep, y_vals in rep_dict.items():
+                y_val_sum += np.array(y_vals)
+            y_val_avg = y_val_sum / len(rep_dict)
+            plt.plot(x_vals, y_val_avg, label=algo, color=cs_algo_colors[algo])
+        plt.title(f"Error rates on {data_type.name}")
         plt.xlabel("Rounds")
         plt.ylabel("MRSE")
         plt.legend()
-        filepath = os.path.join(output_dir, f"{data_type}_error.png")
+        filepath = os.path.join(output_dir, f"{data_type.name}_error.png")
         plt.savefig(filepath)
         plt.close()
 
     # go through a subset of dict list, get the time bar graph
-    x_vals = ["loss", "threshold", "reputation", "multi", "random", "all", "reputation_update"]
+    x_vals = list(CSAlgo)
     y_vals = []
     for x_val in x_vals:
+        total_time = 0
+        reps = 0
         for result_dict in dict_list:
-            if result_dict["params"]["cs_algo"] == x_val and \
-                    result_dict["params"]["dataset_type"] == "homo_low_dev":
-                time = calculate_total_time(result_dict, x_val)
-                y_vals.append(time)
-    colors = [cs_algo_colors[algo] for algo in x_vals]
-    plt.bar(x_vals, y_vals, color=colors)
+            if result_dict["params"]["cs_algo"] == x_val.name and \
+                    result_dict["params"]["dataset_type"] == DatasetType.HOMO_LOW_DEV.name:
+                reps += 1
+                total_time += calculate_total_time(result_dict, x_val)
+        y_vals.append(total_time/reps)
+    colors = [cs_algo_colors[algo.name] for algo in x_vals]
+    plt.bar([algo.name for algo in x_vals], y_vals, color=colors)
     plt.title("Total time of training")
     plt.xlabel("CS Algorithms")
     plt.ylabel("Seconds")
@@ -80,7 +93,7 @@ def plot_graphs():
 # others only wait for the picked clients
 def calculate_total_time(result_dict, cs_algo):
     total = 0
-    if cs_algo == "loss":
+    if cs_algo == CSAlgo.LOSS:
         # get all client's response times
         for round_name, stats in result_dict["results"].items():
             if round_name != "init":

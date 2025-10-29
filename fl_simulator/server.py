@@ -11,7 +11,6 @@
 # also, upon receiving the updates, can aggregate them with respect to client's weights
 
 import numpy as np
-import pprint
 from .client_selection_algorithms.loss_value_based import loss_value_based_server as CS_loss
 from .client_selection_algorithms.threshold_based import threshold_based_server as CS_threshold
 from .client_selection_algorithms.reputation_based import reputation_based_server as CS_reputation
@@ -19,6 +18,8 @@ from .client_selection_algorithms.multi_criteria_based import multi_criteria_bas
 from .client_selection_algorithms.random_based import random_based_server as CS_random
 from .client_selection_algorithms.all_based import all_based_server as CS_all
 from .client_selection_algorithms.reputation_update_based import reputation_update_based_server as CS_reputation_update
+from .common import CSAlgo
+from dataset_generator.common import DatasetType
 
 class Server:
 
@@ -26,7 +27,7 @@ class Server:
     # float constant: constant of the aggreagated line model (b of ax+b)
     # Dict(Client->int) clients: a dictionary of clients together with their weights
     # int no_of_clients: number of clients to be picked in each iteration 
-    def __init__(self, CS_algo: str, learning_rate: float, no_of_picked_clients=None, threshold=None, logger=None, dataset_type=None, m_score_weights = None):
+    def __init__(self, CS_algo, learning_rate: float, no_of_picked_clients=None, threshold=None, logger=None, dataset_type=None, m_score_weights = None):
         self.CS_algo = CS_algo
         self.learning_rate = learning_rate
         self.no_of_picked_clients = no_of_picked_clients
@@ -52,7 +53,7 @@ class Server:
         self.log_state("init")
 
         for i in range(no_of_rounds):
-            print(f"[{self.dataset_type}+{self.CS_algo}]" .ljust(40), f"is on round {i+1}")
+            print(f"[{self.dataset_type.name}+{self.CS_algo.name}]" .ljust(40), f"is on round {i+1}")
             self.training_round = i+1
 
             # tells the clients to update their attributes at the start of each round
@@ -87,19 +88,19 @@ class Server:
     # int s: no of clients to be picked
     async def request_updates(self, prev_rounds_updates, m_score_weights):
         client_updates = {}
-        if self.CS_algo == "loss":
+        if self.CS_algo == CSAlgo.LOSS:
             client_updates = await CS_loss.request_updates(self)
-        elif self.CS_algo == "threshold":
+        elif self.CS_algo == CSAlgo.THRESHOLD:
             client_updates = await CS_threshold.request_updates(self)
-        elif self.CS_algo == "reputation":
+        elif self.CS_algo == CSAlgo.REPUTATION:
             client_updates = await CS_reputation.request_updates(self)
-        elif self.CS_algo == "random":
+        elif self.CS_algo == CSAlgo.RANDOM:
             client_updates = await CS_random.request_updates(self)
-        elif self.CS_algo == "all":
+        elif self.CS_algo == CSAlgo.ALL:
             client_updates = await CS_all.request_updates(self)
-        elif self.CS_algo == "reputation_update":
+        elif self.CS_algo == CSAlgo.REPUTATION_UPDATE:
             client_updates = await CS_reputation_update.request_updates(self)
-        else:   # self.CS_algo == "multi"
+        else:   # self.CS_algo == CSAlgo.MULTI
             client_updates = await CS_multi_criteria.request_updates(self, prev_rounds_updates, m_score_weights)
         return client_updates
 
@@ -107,19 +108,19 @@ class Server:
 
     # updates the weights of the clients (0=not picked, 1=fully picked)
     def update_client_scores(self, client_updates):
-        if self.CS_algo == "loss":
+        if self.CS_algo == CSAlgo.LOSS:
             CS_loss.update_client_scores(self, client_updates)
-        elif self.CS_algo == "threshold":
+        elif self.CS_algo == CSAlgo.THRESHOLD:
             CS_threshold.update_client_scores(self, client_updates)
-        elif self.CS_algo == "reputation":
+        elif self.CS_algo == CSAlgo.REPUTATION:
             CS_reputation.update_client_scores(self, client_updates)
-        elif self.CS_algo == "random":
+        elif self.CS_algo == CSAlgo.RANDOM:
             CS_random.update_client_scores(self, client_updates)
-        elif self.CS_algo == "all":
+        elif self.CS_algo == CSAlgo.ALL:
             CS_all.update_client_scores(self, client_updates)
-        elif self.CS_algo == "reputation_update":
+        elif self.CS_algo == CSAlgo.REPUTATION_UPDATE:
             CS_reputation_update.update_client_scores(self, client_updates)
-        else:   # self.CS_algo == "multi"
+        else:   # self.CS_algo == CSAlgo.MULTI
             CS_multi_criteria.update_client_scores(self,client_updates)
 
 

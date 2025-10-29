@@ -17,10 +17,10 @@ def get_updates(client, global_model_slope, global_model_constant):
     MIN_DENOMINATOR = 1e-3
 
     # Handle the case where denominator is zero (all x values are the same)
-    if denominator < MIN_DENOMINATOR:
-        client_slope = 0
+    if denominator < MIN_DENOMINATOR or numerator == 0:
+        client_slope = MIN_DENOMINATOR
     else:
-        client_slope = numerator / denominator
+        client_slope = float(numerator) / float(denominator)
     
     # Calculate intercept using the formula
     client_constant = y_mean - client_slope * x_mean
@@ -37,8 +37,8 @@ def get_updates(client, global_model_slope, global_model_constant):
 
     # outlier detection
     if abs(slope_update) > 10:
-        slope_update = 0
+        slope_update = MIN_DENOMINATOR
     if abs(constant_update) > 10:
-        constant_update = 0
+        constant_update = MIN_DENOMINATOR
     
     return (slope_update, constant_update, loss_value)
