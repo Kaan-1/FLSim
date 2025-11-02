@@ -15,8 +15,8 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import fl_simulator.server as sv
-import fl_simulator.client as cl
+import fl_simulator.server_factory as sv_factory
+import fl_simulator.client_factory as cl_factory
 import asyncio
 import logger.logger as lg
 from fl_simulator.common import CSAlgo
@@ -84,7 +84,7 @@ async def run_exp(
         avg_dataset_vals = (avg_data_update, 2, 5, 0, 10, dev)
         for i in range(15):
             client_name = f"client_{i}"
-            clients.append(cl.Client(client_name, CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl_factory.create_client(CS_algo, client_name, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
             
     def semi_homo(dev):
         for i in range(15):
@@ -107,7 +107,7 @@ async def run_exp(
                 constant = 5
             client_name = f"client_{i}"
             avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl_factory.create_client(CS_algo, client_name, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
     
     def hetero(dev):
         for i in range(15):
@@ -124,7 +124,7 @@ async def run_exp(
                 constant = 5
             client_name = f"client_{i}"
             avg_dataset_vals = (avg_data_update, slope, constant, 0, 10, dev)
-            clients.append(cl.Client(client_name, CS_algo, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
+            clients.append(cl_factory.create_client(CS_algo, client_name, cln_init_dataset_size, avg_resp_vals, avg_dataset_vals))
 
     if dataset_type == DatasetType.HOMO_LOW_DEV:
         homo(0.2)
@@ -142,7 +142,7 @@ async def run_exp(
         raise KeyError(f"Invalid experiment type {dataset_type.name}")
     
     # create the server
-    server = sv.Server(CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, 
+    server = sv_factory.create_server(CS_algo, learning_rate, no_of_picked_clients=no_of_picked_cln, threshold=threshold, 
                         logger=logger, dataset_type=dataset_type, m_score_weights = m_score_weights)
 
     # add the clients to the server

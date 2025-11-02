@@ -11,23 +11,16 @@
 
 import asyncio
 import numpy as np
-from .client_selection_algorithms.loss_value_based import loss_value_based_client as CS_loss
-from .client_selection_algorithms.threshold_based import threshold_based_client as CS_threshold
-from .client_selection_algorithms.reputation_based import reputation_based_client as CS_reputation
-from .client_selection_algorithms.multi_criteria_based import multi_criteria_based_client as CS_multi_criteria
-from .client_selection_algorithms.random_based import random_based_client as CS_random
-from .client_selection_algorithms.all_based import all_based_client as CS_all
-from .client_selection_algorithms.reputation_update_based import reputation_update_based_client as CS_reputation_update
+from abc import ABC, abstractmethod
 
-class Client:
+class Client(ABC):
 
     # The attributes of clients get updated every round
-    def __init__(self, name, CS_algo, init_dataset_size, avg_resp_vals, avg_data_vals):
+    def __init__(self, name, init_dataset_size, avg_resp_vals, avg_data_vals):
         self.name = name
         self.download_time = None
         self.upload_time = None
         self.computation_time = None
-        self.CS_algo = CS_algo
         self.dataset = []
 
         # tuple avg_resp_vals: contains the average values of the fields corresponding to responding
@@ -76,26 +69,17 @@ class Client:
         else:
             await asyncio.sleep(self.computation_time)
         
-        updates = None
-        if self.CS_algo == "loss":
-            updates = CS_loss.get_updates(self, global_model_slope, global_model_constant)
-        elif self.CS_algo == "threshold":
-            updates = CS_threshold.get_updates(self, global_model_slope, global_model_constant, threshold)
-        elif self.CS_algo == "reputation":
-            updates = CS_reputation.get_updates(self, global_model_slope, global_model_constant)
-        elif self.CS_algo == "random":
-            updates = CS_random.get_updates(self, global_model_slope, global_model_constant)
-        elif self.CS_algo == "all":
-            updates = CS_all.get_updates(self, global_model_slope, global_model_constant)
-        elif self.CS_algo == "reputation_update":
-            updates = CS_reputation_update.get_updates(self, global_model_slope, global_model_constant)
-        else:   # self.CS_algo == "multi"
-            updates = CS_multi_criteria.get_updates(self, global_model_slope, global_model_constant)
+        updates = self.calculate_updates(global_model_slope, global_model_constant, threshold)
 
         # imitate uploading the calculated local update
         await asyncio.sleep(self.upload_time)
 
         return updates
+    
+    
+    @abstractmethod
+    def calculate_updates(self, global_model_slope, global_model_constant, threshold = None):
+        pass
 
 
     # updates download_time, upload_time, computation_time and dataset of clients
