@@ -71,6 +71,8 @@ class Client:
         if threshold != None:   # special case for threshold based CS
             if threshold < self.computation_time:
                 await asyncio.sleep(threshold)
+            else:
+                await asyncio.sleep(self.computation_time)
         else:
             await asyncio.sleep(self.computation_time)
         
