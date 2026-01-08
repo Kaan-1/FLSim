@@ -3,7 +3,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 from fl_simulator.common import CSAlgo
-from dataset_generator.common import DatasetType
+from dataset.common import DatasetType
 
 def plot_graphs():
 

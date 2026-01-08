@@ -15,7 +15,7 @@ class ReputationBasedServer(Server):
         # initial value of client scores are 10, they will be picked above 6
         selected_clients = []
         for client, score in self.client_scores.items():
-            if score > 6:
+            if score > 7:
                 selected_clients.append(client)
         
         for client in selected_clients:
@@ -49,9 +49,9 @@ class ReputationBasedServer(Server):
         for client, score in self.client_scores.items():
 
             # if the client falls below the threshold, i.e not being picked, increment it's score
-            if score < 7:
+            if score <= 7:
                 self.client_scores[client] += 0.5
-            elif 7 <= score < 25:
+            elif 7 < score < 25:
                 
                 # penalize or reward clients based on avg and max_resp_dev
                 diff = resp_avg - client_updates[client][2]

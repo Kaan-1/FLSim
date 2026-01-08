@@ -84,19 +84,17 @@ class Client(ABC):
 
     # updates download_time, upload_time, computation_time and dataset of clients
     def update_atts(self, training_round, change_dataset = True):
-        self.download_time = abs(np.random.normal(loc=self.avg_resp_vals[1], 
-                                                        scale=self.avg_resp_vals[0]))
-        self.computation_time = abs(np.random.normal(loc=self.avg_resp_vals[2], 
-                                                        scale=self.avg_resp_vals[0]))
-        self.upload_time = abs(np.random.normal(loc=self.avg_resp_vals[3], 
-                                                        scale=self.avg_resp_vals[0]))
+        self.download_time = max(np.random.normal(loc=self.avg_resp_vals[1], scale=self.avg_resp_vals[0]), 0.01)
+        self.computation_time = max(np.random.normal(loc=self.avg_resp_vals[2], scale=self.avg_resp_vals[0]), 0.01)
+        self.upload_time = max(np.random.normal(loc=self.avg_resp_vals[3], scale=self.avg_resp_vals[0]), 0.01)
         if change_dataset:
             no_of_entry_changes = int(round(np.random.normal(loc=0, scale=self.avg_data_vals[0])))
             if no_of_entry_changes > 0:
                 self.add_to_dataset(no_of_entry_changes, training_round)
             elif no_of_entry_changes < 0:
-                if abs(no_of_entry_changes) < len(self.dataset):     # don't compeletely wipe out the dataset
-                    self.remove_from_dataset(abs(no_of_entry_changes))
+                # don't compeletely wipe out the dataset
+                if len(self.dataset) > 3:
+                    self.remove_from_dataset(min(abs(no_of_entry_changes), (len(self.dataset)-3)))
 
 
     # we add the training round as a time stamp to the samples added to the datasets

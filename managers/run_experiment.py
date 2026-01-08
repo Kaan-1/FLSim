@@ -20,12 +20,12 @@ import fl_simulator.client_factory as cl_factory
 import asyncio
 import logger.logger as lg
 from fl_simulator.common import CSAlgo
-from dataset_generator.common import DatasetType
+from dataset.common import DatasetType
 
 
 async def run_exp(
         dataset_type = DatasetType.HETERO_LOW_DEV,
-        CS_algo = CSAlgo.REPUTATION_UPDATE,
+        CS_algo = CSAlgo.ALL,
         rep = 0,
         resp_var = 0.01,
         avg_download_time = 0.01,

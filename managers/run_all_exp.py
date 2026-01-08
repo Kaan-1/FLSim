@@ -1,7 +1,7 @@
 import asyncio
 import run_experiment
 from fl_simulator.common import CSAlgo
-from dataset_generator.common import DatasetType
+from dataset.common import DatasetType
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

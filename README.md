@@ -30,7 +30,7 @@ This simulation tries to derive a 2D line using federated learning on 15 clients
 
 ### Running an Experiment
 
-Before running the experiment, you should go into the run_experiment.py file in the root directory, and modify the variables according to your needs. Values that can be modified can be found between "VARIABLE SPOT START" and "VARIABLE SPOT END". The explanation of the possible values for the exp_type variable is given below, since it is not clear from the get go.
+Before running the experiment, you should go into the config.py file in the root directory, and modify the variables according to your needs. The explanation of the possible values for the exp_type variable is given below, since it is not clear from the get go.
 
 To run an experiment, run the run_all_exp.py file located in the managers/ directory. This will run all simulations with all possible CS algo + dataset pretune combinations (so 4*6=24 experiments) in parallel, and repeat this multiple times to get averaged results. The results from the experiment will be saved under plot/outputs/ directory.
 

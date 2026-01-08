@@ -1,6 +1,6 @@
 ﻿# No of times the experiments will be repeated
 # We later take the averages of the experiments when creating the plots
-TOTAL_REPS = 1
+TOTAL_REPS = 3
 
 
 # variance of response times that the clients will have
