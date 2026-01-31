@@ -23,9 +23,7 @@ class LossValueBasedClient(Client):
             print("Problem A")
             print(f"denominator: {denominator}")
             print(f"numerator: {numerator}")
-            client_slope = MIN_DENOMINATOR
-        else:
-            client_slope = float(numerator) / float(denominator)
+        client_slope = float(numerator) / float(denominator)
         
         # Calculate intercept using the formula
         client_constant = y_mean - client_slope * x_mean
@@ -44,10 +42,9 @@ class LossValueBasedClient(Client):
         if abs(slope_update) > 10:
             print("Problem B")
             print(f"slope_update: {slope_update}")
-            slope_update = MIN_DENOMINATOR
+
         if abs(constant_update) > 10:
             print("Problem C")
             print(f"constant_update: {constant_update}")
-            constant_update = MIN_DENOMINATOR
         
         return (slope_update, constant_update, loss_value)

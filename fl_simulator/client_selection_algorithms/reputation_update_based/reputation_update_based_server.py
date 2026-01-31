@@ -14,7 +14,7 @@ class ReputationUpdateBasedServer(Server):
         # initial value of client scores are 10, they will be picked above 7
         selected_clients = []
         for client, score in self.client_scores.items():
-            if score >= 7:
+            if score > 7:
                 selected_clients.append(client)
 
         for client in selected_clients:
@@ -45,9 +45,9 @@ class ReputationUpdateBasedServer(Server):
         for client, score in self.client_scores.items():
 
             # if the client falls below the threshold, i.e not being picked, increment it's score
-            if score < 7:
+            if score <= 7:
                 self.client_scores[client] += 0.5
-            elif 7 <= score < 25:
+            elif 7 < score < 25:
                 slope_diff_normalized = abs(client_updates[client][0] - avg_slope_update) / max_slope_update
                 cons_diff_normalized = abs(client_updates[client][1] - avg_cons_update) / max_cons_update
                 

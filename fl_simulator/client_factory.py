@@ -1,5 +1,6 @@
 ﻿from .client_selection_algorithms.client import Client
 from .common import CSAlgo
+from data.common import DatasetType
 
-def create_client(cs_algo: CSAlgo, name, init_dataset_size, avg_resp_vals, avg_data_vals) -> Client:
-    return cs_algo.value.client(name, init_dataset_size, avg_resp_vals, avg_data_vals)
+def create_client(dataset_type: DatasetType, cs_algo: CSAlgo, name) -> Client:
+    return cs_algo.value.client(dataset_type, name)

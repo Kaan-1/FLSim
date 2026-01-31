@@ -3,7 +3,7 @@ import asyncio
 import math
 from ..server import Server
 
-class ReputationBasedServer(Server):
+class ReputationTimeBasedServer(Server):
     # int threshold: the time allowed for clients to calculate their updates
     async def request_updates(self, prev_rounds_updates = None, m_score_weights = None):
         client_updates = {}

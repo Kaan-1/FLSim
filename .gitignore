@@ -185,3 +185,6 @@ logger/results/
 
 # plotter
 plot/output/
+
+# client datas
+data/datas

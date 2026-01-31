@@ -1,10 +1,18 @@
 import os
 import json
 import copy
+import shutil
 
 class Logger:
     def __init__(self):
         self.logs = {}
+
+    @staticmethod
+    def clear_results():
+        results_dir = os.path.join(os.path.dirname(__file__), "results")
+        if os.path.exists(results_dir):
+            shutil.rmtree(results_dir)
+        os.makedirs(results_dir, exist_ok=True)
 
     def add_entry_to_dict(self, key, val, entry_path=[]):
         dic = self.get_nested_object(self.logs, entry_path)

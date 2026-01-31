@@ -1,32 +1,36 @@
 import asyncio
 import run_experiment
 from fl_simulator.common import CSAlgo
-from dataset.common import DatasetType
+from data.common import DatasetType
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import plot.plotter as plt
 import config
+import logger.logger as lg
+from data.data_generator import DataGenerator
 
 async def run_all_exp():
     exp_data_types = list(DatasetType)
     exp_CS_algos = list(CSAlgo)
     exp_reps = list(range(config.TOTAL_REPS))
     
+    lg.Logger.clear_results()
+    data_generator = DataGenerator()
+    
     for rep in exp_reps:
+        print("Generating client datas...")
+        data_generator.generate_datas(rep)
+        print("Successfully generated datas!")
+
         print("\n==================================================================================================")
         print(f"======================================== REPETITION {rep} ============================================")
         print("==================================================================================================")
         tasks = [
             run_experiment.run_exp(dataset_type=dt, CS_algo=algo, rep=rep,
-                                   resp_var=config.RESP_VAR,
-                                   avg_download_time=config.AVG_DOWNLOAD_TIME,
-                                   avg_computation_time=config.AVG_COMPUTATION_TIME,
-                                   avg_upload_time=config.AVG_UPLOAD_TIME,
-                                   cln_init_dataset_size=config.CLN_INIT_DATASET_SIZE,
-                                   avg_data_update=config.AVG_DATA_UPDATE,
                                    learning_rate=config.LEARNING_RATE,
                                    no_of_rounds=config.NO_OF_ROUNDS,
+                                   no_of_cln=config.NO_OF_CLN,
                                    no_of_picked_cln=config.NO_OF_PICKED_CLN,
                                    threshold=config.THRESHOLD,
                                    download_time_weight=config.DOWNLOAD_TIME_WEIGHT,
@@ -41,7 +45,11 @@ async def run_all_exp():
         await asyncio.gather(*tasks)
         print(f"Repetition {rep} has finished")
     
+    
+    print("Plotting the results. This may take a minute...")
     plt.plot_graphs()
+    print("Successfully plotted the results!")
+    print("You can find the plots under 'plot/outputs/'")
 
 
 if __name__ == "__main__":

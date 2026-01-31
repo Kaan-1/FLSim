@@ -2,8 +2,6 @@
 
 A tool for simulation and analysis of top Federated learning (FL) client selection (CS) algorithms.
 
-**WARNING**: This project is in working progress. Public contributions will not be merged since this is a school project, sadly :( You can check out the TO DO list at the bottom to track the current status of the project.
-
 ## Simulation Logic
 
 This simulation tries to derive a 2D line using federated learning on 15 clients. We assume that we have are trying to reach a "true" line, and create different syntetic datasets for clients, where some follow this "true" line, and some don't. Clients all have different download, compute and upload time, and they differ in many other ways as well. User can adjust these parameters as explained later to run the simulation in different settings. Simulation currently supports the following client selection algorithms:
@@ -30,9 +28,9 @@ This simulation tries to derive a 2D line using federated learning on 15 clients
 
 ### Running an Experiment
 
-Before running the experiment, you should go into the config.py file in the root directory, and modify the variables according to your needs. The explanation of the possible values for the exp_type variable is given below, since it is not clear from the get go.
+Before running the experiment, you should go into the config.py file in the root directory, and modify the variables according to your needs. The explanation of the possible values for the `exp_type` variable is given below, since it is not clear from the get go.
 
-To run an experiment, run the run_all_exp.py file located in the managers/ directory. This will run all simulations with all possible CS algo + dataset pretune combinations (so 4*6=24 experiments) in parallel, and repeat this multiple times to get averaged results. The results from the experiment will be saved under plot/outputs/ directory.
+To run an experiment, run `managers/run_all_exp.py` from the root directory. This will run all simulations with all possible CS algo + dataset pretune combinations (so 4*6=24 experiments) in parallel, and repeat this multiple times to get averaged results. The results from the experiment will be saved under `plot/outputs/` directory.
 
 ### Pretuned Datasets
 
@@ -55,3 +53,11 @@ There are several pretuned experiment datasets for a user to utilize. The datase
 
 - **hetero_high_dev**: Syntetic datasets of clients follow different normal distributions. In particular, some are positively skewed, and some are on the true line. They follow high individual deviations.
 <p align="center"><img src="plot/dataset_visualizations/hetero_high_dev.png" height="300"></p>
+
+## Adding FL Methods
+
+Add your unique FL method by following the below two steps
+
+1) Add your algorithm as an `ENUM` under `fl_simulator/common.py`, follow the same patter as other algorithms existing the python file to achieve this.
+
+2) 

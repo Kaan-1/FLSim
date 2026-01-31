@@ -4,7 +4,8 @@ from ..client import Client
 
 class ThresholdBasedClient(Client):
     def calculate_updates(self, global_model_slope, global_model_constant, threshold = None):
-        if threshold < self.computation_time:
+        response_time = self.upload_time + self.computation_time + self.download_time
+        if response_time > threshold:
             return False
 
         # Extract x and y from the dataset tuples
@@ -26,9 +27,7 @@ class ThresholdBasedClient(Client):
             print("Problem A")
             print(f"denominator: {denominator}")
             print(f"numerator: {numerator}")
-            client_slope = MIN_DENOMINATOR
-        else:
-            client_slope = float(numerator) / float(denominator)
+        client_slope = float(numerator) / float(denominator)
         
         # Calculate intercept using the formula
         client_constant = y_mean - client_slope * x_mean
@@ -41,10 +40,9 @@ class ThresholdBasedClient(Client):
         if abs(slope_update) > 10:
             print("Problem B")
             print(f"slope_update: {slope_update}")
-            slope_update = MIN_DENOMINATOR
+
         if abs(constant_update) > 10:
             print("Problem C")
             print(f"constant_update: {constant_update}")
-            constant_update = MIN_DENOMINATOR
 
         return (slope_update, constant_update)

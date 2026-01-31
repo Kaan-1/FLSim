@@ -2,12 +2,42 @@ import os
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from fl_simulator.common import CSAlgo
-from dataset.common import DatasetType
+from data.common import DatasetType
+
+def generate_distinct_colors(n):
+    """Generate n distinct colors using HSV color space."""
+    colors = []
+    for i in range(n):
+        hue = i / n
+        saturation = 0.7
+        value = 0.9
+        rgb = mcolors.hsv_to_rgb([hue, saturation, value])
+        colors.append(rgb)
+    return colors
+
+def load_generated_data():
+    """Load all pre-generated data files from data/datas directory."""
+    current_dir = os.path.dirname(__file__)
+    datas_dir = os.path.abspath(os.path.join(current_dir, '..', 'data', 'datas'))
+    
+    data_files = {}
+    if os.path.exists(datas_dir):
+        json_files = [f for f in os.listdir(datas_dir) if f.endswith('.json')]
+        for file_name in json_files:
+            # Extract rep number from filename (e.g., rep_0.json -> 0)
+            rep = int(file_name.split('_')[1].split('.')[0])
+            file_path = os.path.join(datas_dir, file_name)
+            with open(file_path, 'r') as f:
+                data_files[rep] = json.load(f)
+    
+    return data_files
 
 def plot_graphs():
 
     exp_data_types = list(DatasetType)
+    cs_algo_types = list(CSAlgo)
 
     validation_dataset = create_val_dataset()
 
@@ -27,17 +57,13 @@ def plot_graphs():
         with open(file_path, 'r') as f:
             data = json.load(f)
             dict_list.append(data)
+    
+    # load pre-generated data files
+    generated_data = load_generated_data()
 
-    # define the colors of cs algorithms
-    cs_algo_colors = {
-        CSAlgo.LOSS.name: "blue",
-        CSAlgo.THRESHOLD.name: "red",
-        CSAlgo.REPUTATION.name: "green",
-        CSAlgo.MULTI.name: "purple",
-        CSAlgo.RANDOM.name: "orange",
-        CSAlgo.ALL.name: "pink",
-        CSAlgo.REPUTATION_UPDATE.name: "lightgreen"
-    }
+    # define the colors of cs algorithms dynamically
+    distinct_colors = generate_distinct_colors(len(cs_algo_types))
+    cs_algo_colors = {algo.name: distinct_colors[i] for i, algo in enumerate(cs_algo_types)}
 
     # go through the dict list, get the MSRE plots
     for data_type in exp_data_types:
@@ -66,49 +92,76 @@ def plot_graphs():
         plt.close()
 
     # go through a subset of dict list, get the time bar graph
-    x_vals = list(CSAlgo)
-    y_vals = []
-    for x_val in x_vals:
-        total_time = 0
-        reps = 0
-        for result_dict in dict_list:
-            if result_dict["params"]["cs_algo"] == x_val.name and \
-                    result_dict["params"]["dataset_type"] == DatasetType.HOMO_LOW_DEV.name:
-                reps += 1
-                total_time += calculate_total_time(result_dict, x_val)
-        y_vals.append(total_time/reps)
-    colors = [cs_algo_colors[algo.name] for algo in x_vals]
-    plt.bar([algo.name for algo in x_vals], y_vals, color=colors)
-    plt.title("Total time of training")
-    plt.xlabel("CS Algorithms")
-    plt.ylabel("Seconds")
-    file_path = os.path.join(output_dir, "total_times.png")
-    plt.savefig(file_path)
-    plt.close()
+    for data_type in exp_data_types:
+        x_vals = list(CSAlgo)
+        y_vals = []
+        for x_val in x_vals:
+            total_time = 0
+            reps = 0
+            for result_dict in dict_list:
+                if result_dict["params"]["cs_algo"] == x_val.name and \
+                        result_dict["params"]["dataset_type"] == data_type.name:
+                    reps += 1
+                    rep_num = result_dict["params"]["rep"]
+                    dataset_type = result_dict["params"]["dataset_type"]
+                    total_time += calculate_total_time(result_dict, x_val, generated_data, rep_num, dataset_type)
+            if reps > 0:
+                y_vals.append(total_time/reps)
+            else:
+                y_vals.append(0)
+        plt.figure(figsize=(7, 6))
+        colors = [cs_algo_colors[algo.name] for algo in x_vals]
+        plt.bar([algo.name for algo in x_vals], y_vals, color=colors)
+        plt.xticks(rotation=90)
+        plt.title(f"Total time of training on {data_type.name}")
+        plt.xlabel("CS Algorithms")
+        plt.ylabel("Seconds")
+        plt.subplots_adjust(bottom=0.3)
+        file_path = os.path.join(output_dir, f"{data_type.name}_total_times.png")
+        plt.savefig(file_path)
+        plt.close()
 
 
 
 # time calculation is different for loss vs others
 # in loss, the server waits for every client, every round
 # others only wait for the picked clients
-def calculate_total_time(result_dict, cs_algo):
+def calculate_total_time(result_dict, cs_algo, generated_data, rep_num, dataset_type):
     total = 0
+    
+    # Get the response times from the pre-generated data
+    data_for_rep = generated_data.get(rep_num)
+    if data_for_rep is None:
+        raise ValueError(f"No generated data found for rep {rep_num}")
+    
+    data_for_dataset = data_for_rep.get(dataset_type)
+    if data_for_dataset is None:
+        raise ValueError(f"No generated data found for dataset type {dataset_type}")
+    
     if cs_algo == CSAlgo.LOSS:
         # get all client's response times
         for round_name, stats in result_dict["results"].items():
             if round_name != "init":
+                # Extract round number from round_name (e.g., "round_1" -> 1)
+                round_num = int(round_name.split('_')[1]) - 1
+                round_key = f'round_{round_num}'
+                
                 response_times = []
-                for client_name, response_time in result_dict["results"][round_name]["response_times"].items():
-                    response_times.append(response_time)
+                for client_name in data_for_dataset[round_key]['response_times'].keys():
+                    response_times.append(data_for_dataset[round_key]['response_times'][client_name])
                 # add the max
                 total += max(response_times)
     else:
         for round_name, stats in result_dict["results"].items():
             if round_name != "init":
-                # get their response times
+                # Extract round number from round_name (e.g., "round_1" -> 1)
+                round_num = int(round_name.split('_')[1]) - 1
+                round_key = f'round_{round_num}'
+                
+                # get their response times for picked clients only
                 response_times = []
                 for client_name in result_dict["results"][round_name]["updates"]:
-                    response_times.append(result_dict["results"][round_name]["response_times"][client_name])
+                    response_times.append(data_for_dataset[round_key]['response_times'][client_name])
                 # pick the maximum one
                 total += max(response_times)
     return total
