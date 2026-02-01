@@ -4,13 +4,13 @@ A tool for simulation and analysis of top Federated learning (FL) client selecti
 
 ## Simulation Logic
 
-This simulation tries to derive a 2D line using federated learning on 15 clients. We assume that we have are trying to reach a "true" line, and create different syntetic datasets for clients, where some follow this "true" line, and some don't. Clients all have different download, compute and upload time, and they differ in many other ways as well. User can adjust these parameters as explained later to run the simulation in different settings. Simulation currently supports the following client selection algorithms:
+This simulation tries to derive a 2D line using federated learning on a selected number of clients. We assume that we have are trying to reach a "true" line, and create different syntetic datasets for clients, where some follow this "true" line, and some don't. Clients all have different download, compute and upload time, and they differ in many other ways as well. User can adjust these parameters as explained later to run the simulation in different settings. Simulation currently supports the following client selection algorithms for comparison:
 
 - **Loss based client selection**: Selects clients with the highest training loss to participate in the next round
 
 - **Threshold based client selection**: Chooses clients who submit their local updates before the deadline
 
-- **Reputation based client selection**: Picks clients based on their historical response times
+- **Reputation-time based client selection**: Picks clients based on their historical response times
 
 - **Reputation-update based client selection**: Picks clients whose local updates are close to other clients
 
@@ -28,9 +28,9 @@ This simulation tries to derive a 2D line using federated learning on 15 clients
 
 ### Running an Experiment
 
-Before running the experiment, you should go into the config.py file in the root directory, and modify the variables according to your needs. The explanation of the possible values for the `exp_type` variable is given below, since it is not clear from the get go.
+Before running the experiment, you should go into the config.py file in the root directory, and modify the variables according to your needs. The explanation of the possible values for the `exp_type` variable is given below, since they are not clear from the get go.
 
-To run an experiment, run `managers/run_all_exp.py` from the root directory. This will run all simulations with all possible CS algo + dataset pretune combinations (so 4*6=24 experiments) in parallel, and repeat this multiple times to get averaged results. The results from the experiment will be saved under `plot/outputs/` directory.
+To run an experiment, run `managers/run_all_exp.py` from the root directory. This will run all simulations with all possible CS algo + dataset pretune combinations (so 4*7=28 experiments) in parallel, and repeat this multiple times with different seeds to get averaged results. The results from the experiment will be saved under `plot/outputs/` directory.
 
 ### Pretuned Datasets
 
@@ -60,4 +60,10 @@ Add your unique FL method by following the below two steps
 
 1) Add your algorithm as an `ENUM` under `fl_simulator/common.py`, follow the same patter as other algorithms existing the python file to achieve this.
 
-2) 
+2) Open a folder with your CS algo name under `fl_simulator/client_selection_algorithms/` folder. After this, open two python files in this folder, one for client implementation, and the other for the server implementation.
+
+3) Implement client and server as classes that inherit from the existing files. To do this, you can copy the logic from the existing CS algorithm implementation. The base server and client files exist under `fl_simulator/client_selection_algorithms/` as `client.py` and `server.py`
+
+4) Implement the inherited abstract `calculate_updates()` function for clients, and `request_updates()`, `update_client_scores()` for the server.
+
+5) DONE! Hopefully your cs algo should exist in the plots after you ran the programme.

@@ -64,8 +64,6 @@ class ReputationTimeBasedServer(Server):
                 else:       # ((2*max_resp_dev)/3) <= abs_diff <= max_resp_dev
                     self.client_scores[client] += 3 * sign
 
-                # TO DO: calculate the average of the model updates
-
     # returns the average of the response times and the highest deviation from the average
     def get_resp_time_stats(self, client_updates):
         values_list = list(client_updates.values())

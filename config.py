@@ -9,7 +9,7 @@ REALISM = False
 
 # No of times the experiments will be repeated
 # We later take the averages of the experiments when creating the plots
-TOTAL_REPS = 10
+TOTAL_REPS = 5
 
 
 # variance of response times that the clients will have
@@ -65,3 +65,7 @@ UPLOAD_TIME_WEIGHT = 0.5
 DATA_SIZE_WEIGHT = 1
 SAMPLE_FRESHNESS_WEIGHT = 1
 LOSS_MAGNITUDE_WEIGHT = 5
+
+
+# prints "problem" when high slope or constant update returns from clients
+DEBUG = False

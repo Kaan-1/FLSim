@@ -1,6 +1,7 @@
 # implements the get_updates() method of the client wrt the reputation based algorithm
 import numpy as np
 from ..client import Client
+import config
 
 class ReputationTimeBasedClient(Client):
     def calculate_updates(self, global_model_slope, global_model_constant, threshold = None):
@@ -19,7 +20,7 @@ class ReputationTimeBasedClient(Client):
         MIN_DENOMINATOR = 1e-3
 
         # Handle the case where denominator is zero (all x values are the same)
-        if denominator < MIN_DENOMINATOR or numerator == 0:
+        if (denominator < MIN_DENOMINATOR or numerator == 0) and config.DEBUG:
             print("Problem A")
             print(f"denominator: {denominator}")
             print(f"numerator: {numerator}")
@@ -38,11 +39,11 @@ class ReputationTimeBasedClient(Client):
         response_time = self.download_time + self.computation_time + self.upload_time
 
         # outlier detection
-        if abs(slope_update) > 10:
+        if abs(slope_update) > 10 and config.DEBUG:
             print("Problem B")
             print(f"slope_update: {slope_update}")
 
-        if abs(constant_update) > 10:
+        if abs(constant_update) > 10 and config.DEBUG:
             print("Problem C")
             print(f"constant_update: {constant_update}")
 

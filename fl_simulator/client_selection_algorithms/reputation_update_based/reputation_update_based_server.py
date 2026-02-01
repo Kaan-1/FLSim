@@ -55,13 +55,13 @@ class ReputationUpdateBasedServer(Server):
                 if 0 <= slope_diff_normalized <= 1/3 or max_slope_update < 0.5:
                     self.client_scores[client] += 1
                 elif 2/3 <= slope_diff_normalized <= 1:
-                    self.client_scores[client] -= 1.5
+                    self.client_scores[client] -= 1
 
                 # update score wrt slope difference from the average
                 if 0 <= cons_diff_normalized <= 1/3 or max_cons_update < 1:
                     self.client_scores[client] += 1
                 elif 2/3 <= cons_diff_normalized <= 1:
-                    self.client_scores[client] -= 1.5
+                    self.client_scores[client] -= 1
 
     def get_update_stats(self, client_updates):
         """
